@@ -1,0 +1,6 @@
+
+Write a simple ios app that imports the elastos connectivity SDK, the essentials
+connector and deals with local identity and essentials identity sign in, hive, payments, contracts, etc.
+
+For every operation, the local identity or essentials should be triggered and returned the appropriate response.
+This response should then be displayed in the test app.

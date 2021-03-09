@@ -1,0 +1,5 @@
+Write a simple NodeJS server that imports the "elastos connectivity server nodejs" SDK.
+
+This server should be able to proxy requests from a elastos connectivity CLIENT sdk (web client - ex: the web client test in this repo).
+It should also initiate a connection with essentials and be able to send intent requests to essentials
+through the created websocket communication layer.
