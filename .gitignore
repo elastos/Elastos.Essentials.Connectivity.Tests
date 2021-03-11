@@ -2,3 +2,4 @@ ionic-module-template/
 MyFirstIdentityIonicTest/
 MyFirstIdentityTemporaryModule/
 .DS_Store
+package-lock.json
