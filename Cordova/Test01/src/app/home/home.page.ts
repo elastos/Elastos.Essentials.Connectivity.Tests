@@ -50,6 +50,10 @@ export class HomePage {
       console.log('auth error');
     });
     console.log('getClientWithAuth:', hiveClient);
+
+    let vault = await hiveClient.getVault("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
+    let callResult = await vault.getScripting().call("inexistingScript");
+    console.log("Hive script call result:", callResult);
   }
 
 }
