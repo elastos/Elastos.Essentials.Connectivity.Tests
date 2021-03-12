@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Hive } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 
 declare let intentPlugin: IntentPlugin.Intent;
 @Component({
@@ -41,6 +42,14 @@ export class HomePage {
     }
 
     console.log("tested Intent");
+  }
+
+  public async testAuth() {
+    let authHelper = new Hive.AuthHelper();
+    let hiveClient = await authHelper.getClientWithAuth((e)=>{
+      console.log('auth error');
+    });
+    console.log('getClientWithAuth:', hiveClient);
   }
 
 }
