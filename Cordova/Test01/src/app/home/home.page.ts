@@ -68,4 +68,8 @@ export class HomePage {
     let callResult = await vault.getScripting().call("inexistingScript");
     console.log("Hive script call result:", callResult);
   }
+
+  public async unselectActiveConnector() {
+    Connectivity.setActiveConnector(null);
+  }
 }
