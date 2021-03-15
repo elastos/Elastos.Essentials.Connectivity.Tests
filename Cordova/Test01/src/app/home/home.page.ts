@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
-import { Hive } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , Connectivity } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 
+declare let didManager: DIDPlugin.DIDManager;
 declare let intentPlugin: IntentPlugin.Intent;
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -13,6 +16,8 @@ export class HomePage {
     intentPlugin.addIntentListener((ret) => {
       this.onIntentReceived(ret);
     });
+
+    Connectivity.registerConnector(new EssentialsConnector());
   }
 
   async onIntentReceived(intent: IntentPlugin.ReceivedIntent) {
@@ -44,6 +49,12 @@ export class HomePage {
     console.log("tested Intent");
   }
 
+  public async testResolveDIDDocument() {
+    didManager.resolveDidDocument("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq", true, (doc)=>{
+      alert("DIDDOC: " + JSON.stringify(doc));
+    });
+  }
+
   public async testAuth() {
     let authHelper = new Hive.AuthHelper();
     let hiveClient = await authHelper.getClientWithAuth((e)=>{
@@ -52,8 +63,9 @@ export class HomePage {
     console.log('getClientWithAuth:', hiveClient);
 
     let vault = await hiveClient.getVault("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
+    console.log("Got vault", vault);
+
     let callResult = await vault.getScripting().call("inexistingScript");
     console.log("Hive script call result:", callResult);
   }
-
 }
