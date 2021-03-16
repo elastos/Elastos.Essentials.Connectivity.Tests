@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Hive , Connectivity } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , connectivity, DID } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
@@ -17,7 +17,7 @@ export class HomePage {
       this.onIntentReceived(ret);
     });
 
-    Connectivity.registerConnector(new EssentialsConnector());
+    connectivity.registerConnector(new EssentialsConnector());
   }
 
   async onIntentReceived(intent: IntentPlugin.ReceivedIntent) {
@@ -50,12 +50,26 @@ export class HomePage {
   }
 
   public async testResolveDIDDocument() {
+
+    //TMP
+    didManager.generateMnemonic("FRENCH", (mnemonic)=>{});
+
     didManager.resolveDidDocument("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq", true, (doc)=>{
       alert("DIDDOC: " + JSON.stringify(doc));
     });
   }
 
-  public async testAuth() {
+  public async testGetCredentials() {
+    let didAccess = new DID.DIDAccess();
+    console.log("Trying to get credentials");
+    let credentials = await didAccess.getCredentials({
+      email:true
+    });
+
+    console.log("Got credentials:", credentials);
+  }
+
+  public async testHiveAuth() {
     let authHelper = new Hive.AuthHelper();
     let hiveClient = await authHelper.getClientWithAuth((e)=>{
       console.log('auth error');
@@ -70,6 +84,6 @@ export class HomePage {
   }
 
   public async unselectActiveConnector() {
-    Connectivity.setActiveConnector(null);
+    connectivity.setActiveConnector(null);
   }
 }
