@@ -4,8 +4,6 @@ npm i -D
 
 # Development
 
-
-
 NPM link each module that you want to develop and debug locally. This overwrites the module in
 node_modules with a symbol link to your local folder.
 

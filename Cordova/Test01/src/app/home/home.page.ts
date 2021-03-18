@@ -4,6 +4,7 @@ import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cor
 
 declare let didManager: DIDPlugin.DIDManager;
 declare let intentPlugin: IntentPlugin.Intent;
+declare let hiveManager: HivePlugin.HiveManager;
 
 @Component({
   selector: 'app-home',
@@ -62,14 +63,31 @@ export class HomePage {
   public async testGetCredentials() {
     let didAccess = new DID.DIDAccess();
     console.log("Trying to get credentials");
-    let credentials = await didAccess.getCredentials({
+    let presentation = await didAccess.getCredentials({
       email:true
     });
 
-    console.log("Got credentials:", credentials);
+    if (presentation) {
+      console.log("Got credentials:", presentation);
+      alert(JSON.stringify(presentation));
+    }
+    else {
+      alert("Empty presentation returned, something wrong happened, or operation was cancelled");
+    }
   }
 
   public async testHiveAuth() {
+    let vault = await this.getVault();
+
+    let callResult = await vault.getScripting().setScript("inexistingScript", hiveManager.Scripting.Executables.Database.newFindOneQuery("inexistingCollection"));
+    console.log("Hive script call result:", callResult);
+    if (callResult)
+      alert("All good");
+    else
+      alert("Failed to call hive scripting API. Something wrong happened.");
+  }
+
+  private async getVault(): Promise<HivePlugin.Vault> {
     let authHelper = new Hive.AuthHelper();
     let hiveClient = await authHelper.getClientWithAuth((e)=>{
       console.log('auth error');
@@ -79,11 +97,19 @@ export class HomePage {
     let vault = await hiveClient.getVault("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
     console.log("Got vault", vault);
 
-    let callResult = await vault.getScripting().call("inexistingScript");
-    console.log("Hive script call result:", callResult);
+    return vault;
   }
 
   public async unselectActiveConnector() {
     connectivity.setActiveConnector(null);
+  }
+
+  public async revokeHiveAuthToken() {
+    let vault = await this.getVault();
+    vault.revokeAccessToken();
+  }
+
+  public deleteLocalStorage() {
+    window.localStorage.clear();
   }
 }
