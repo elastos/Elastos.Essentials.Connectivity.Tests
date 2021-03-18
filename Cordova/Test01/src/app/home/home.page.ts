@@ -67,35 +67,35 @@ export class HomePage {
         name: true,
         avatar: {
           required: false,
-          reason: "For profile picture"
+          reason: "For test"
         },
         email: {
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         gender: {
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         telephone: {
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         nation: {
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         nickname:{
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         description:{
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         },
         interests:{
           required: false,
-          reason: "Maybe Feeds dapp need"
+          reason: "For test"
         }
       }
       );
