@@ -64,8 +64,41 @@ export class HomePage {
     let didAccess = new DID.DIDAccess();
     console.log("Trying to get credentials");
     let presentation = await didAccess.getCredentials({
-      email:true
-    });
+        name: true,
+        avatar: {
+          required: false,
+          reason: "For profile picture"
+        },
+        email: {
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        gender: {
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        telephone: {
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        nation: {
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        nickname:{
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        description:{
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        },
+        interests:{
+          required: false,
+          reason: "Maybe Feeds dapp need"
+        }
+      }
+      );
 
     if (presentation) {
       console.log("Got credentials:", presentation);
