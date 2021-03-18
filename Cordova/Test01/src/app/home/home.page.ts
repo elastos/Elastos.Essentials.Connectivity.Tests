@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Hive , connectivity, DID } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , connectivity, DID, localIdentityManager } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
@@ -111,5 +111,9 @@ export class HomePage {
 
   public deleteLocalStorage() {
     window.localStorage.clear();
+  }
+
+  public manageLocalIdentity() {
+    localIdentityManager.manageIdentity();
   }
 }
