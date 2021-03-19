@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Hive , connectivity, DID, localIdentityManager } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , connectivity, DID, localIdentity, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
@@ -12,13 +12,19 @@ declare let hiveManager: HivePlugin.HiveManager;
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  private essentialsConnector = new EssentialsConnector();
 
   constructor() {
     intentPlugin.addIntentListener((ret) => {
       this.onIntentReceived(ret);
     });
 
-    connectivity.registerConnector(new EssentialsConnector());
+    connectivity.registerConnector(this.essentialsConnector);
+
+    // Needed for hive authentication (app id credential)
+    // TODO - Now this is friend's dapp DID. Need to create a DID for this test app and configure it
+    // with proper redirect url, etc.
+    connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A");
   }
 
   async onIntentReceived(intent: IntentPlugin.ReceivedIntent) {
@@ -147,6 +153,22 @@ export class HomePage {
   }
 
   public manageLocalIdentity() {
-    localIdentityManager.manageIdentity();
+    localIdentity.manageIdentity();
+  }
+
+  public setLanguage(lang: string) {
+    localization.setLanguage(lang);
+  }
+
+  public setDarkMode(useDarkMode: boolean) {
+    theme.enableDarkMode(useDarkMode);
+  }
+
+  public registerEssentialsConnector() {
+    connectivity.registerConnector(this.essentialsConnector);
+  }
+
+  public unregisterEssentialsConnector() {
+    connectivity.unregisterConnector(this.essentialsConnector.name);
   }
 }

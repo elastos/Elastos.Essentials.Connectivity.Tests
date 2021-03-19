@@ -29,5 +29,15 @@
     <ion-button (click)="deleteLocalStorage()">Delete local storage (instance DIDs, local identity etc)</ion-button>
     <br/>
     <ion-button (click)="manageLocalIdentity()">Manage local identity</ion-button>
+    <br/>
+    <ion-button (click)="setLanguage('en')">Language: EN</ion-button>
+    <ion-button (click)="setLanguage('fr')">Language: FR</ion-button>
+    <ion-button (click)="setLanguage('zh')">Language: ZH</ion-button>
+    <br/>
+    <ion-button (click)="setDarkMode(false)">Light theme mode</ion-button>
+    <ion-button (click)="setDarkMode(true)">Dark theme mode</ion-button>
+    <br/>
+    <ion-button (click)="registerEssentialsConnector()">Connector: register Essentials</ion-button>
+    <ion-button (click)="unregisterEssentialsConnector()">Connector: unregister Essentials</ion-button>
   </div>
 </ion-content>
