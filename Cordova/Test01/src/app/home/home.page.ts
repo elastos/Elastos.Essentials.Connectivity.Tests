@@ -69,7 +69,7 @@ export class HomePage {
   public async testGetCredentials() {
     let didAccess = new DID.DIDAccess();
     console.log("Trying to get credentials");
-    let presentation = await didAccess.getCredentials({
+    let presentation = await didAccess.getCredentials({claims: {
         name: true,
         avatar: {
           required: false,
@@ -103,7 +103,7 @@ export class HomePage {
           required: false,
           reason: "For test"
         }
-      }
+      }}
       );
 
     if (presentation) {
