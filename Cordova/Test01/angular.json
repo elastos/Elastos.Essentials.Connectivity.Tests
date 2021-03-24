@@ -46,7 +46,8 @@
             "styles": [
               "src/theme/variables.scss",
               "src/global.scss",
-              "node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist.esm/bundle.css"
+              "node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist.esm/bundle.css",
+              "node_modules/@elastosfoundation/elastos-connector-localidentity-cordova/dist.esm/bundle.css"
             ],
             "scripts": []
           },
