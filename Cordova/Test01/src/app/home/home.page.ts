@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
-import { LocalIdentityConnector } from "@elastosfoundation/elastos-connector-localidentity-cordova";
-import { localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
+import { LocalIdentityConnector, localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
 declare let intentPlugin: IntentPlugin.Intent;

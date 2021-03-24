@@ -3,7 +3,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": ["elastos-cordova-plugin-intent", "elastos-cordova-plugin-hive"]
+    "types": [
+      "@elastosfoundation/elastos-cordova-plugin-hive",
+      "@elastosfoundation/elastos-cordova-plugin-did",
+      "@elastosfoundation/elastos-cordova-plugin-intent"
+    ]
   },
   "files": [
     "src/main.ts",
