@@ -36,7 +36,11 @@
                 "output": "assets"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "styles": [
+              "src/theme/variables.scss",
+              "src/global.scss",
+              "node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist/bundle.css"
+            ],
             "scripts": []
           },
           "configurations": {
