@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Hive , connectivity, DID, localIdentity, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , connectivity, DID, Wallet, localIdentity, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
@@ -113,6 +113,13 @@ export class HomePage {
     else {
       alert("Empty presentation returned, something wrong happened, or operation was cancelled");
     }
+  }
+
+  public async testPay() {
+    let wallet = new Wallet.WalletAccess();
+    console.log("Trying to get credentials");
+    let response = await wallet.pay({receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.01, memo: 'just test memo', currency: 'ELA/ETHSC'});
+    console.log("pay respone", response);
   }
 
   public async testHiveAuth() {
