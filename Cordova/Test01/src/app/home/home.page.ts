@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { Hive , connectivity, DID, Wallet, localIdentity, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
+import { LocalIdentityConnector } from "@elastosfoundation/elastos-connector-localidentity-cordova";
+import { localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
 declare let intentPlugin: IntentPlugin.Intent;
@@ -12,6 +14,7 @@ declare let hiveManager: HivePlugin.HiveManager;
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  private localIdentityConnector = new LocalIdentityConnector();
   private essentialsConnector = new EssentialsConnector();
 
   constructor() {
@@ -19,6 +22,7 @@ export class HomePage {
       this.onIntentReceived(ret);
     });
 
+    connectivity.registerConnector(this.localIdentityConnector);
     connectivity.registerConnector(this.essentialsConnector);
 
     // Needed for hive authentication (app id credential)
@@ -177,5 +181,13 @@ export class HomePage {
 
   public unregisterEssentialsConnector() {
     connectivity.unregisterConnector(this.essentialsConnector.name);
+  }
+
+  public registerLocalConnector() {
+    connectivity.registerConnector(this.localIdentityConnector);
+  }
+
+  public unregisterLocalConnector() {
+    connectivity.unregisterConnector(this.localIdentityConnector.name);
   }
 }

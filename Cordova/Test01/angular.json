@@ -32,14 +32,14 @@
               },
               {
                 "glob": "**/*",
-                "input": "./node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist/assets",
+                "input": "./node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist.esm/assets",
                 "output": "assets"
               }
             ],
             "styles": [
               "src/theme/variables.scss",
               "src/global.scss",
-              "node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist/bundle.css"
+              "node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist.esm/bundle.css"
             ],
             "scripts": []
           },
