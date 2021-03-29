@@ -29,7 +29,12 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
-              }
+              },
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@elastosfoundation/elastos-connector-localidentity-cordova/dist/assets",
+                "output": "assets"
+            }
             ],
             "styles": [
               {

@@ -3,6 +3,7 @@ import { NavController } from '@ionic/angular';
 import { ToastController } from '@ionic/angular';
 import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
 import { TitleBarIconSlot } from 'src/app/components/titlebar/titlebar.types';
+import { DID, connectivity } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 
 declare let intentPlugin: IntentPlugin.Intent;
 
@@ -56,19 +57,16 @@ export class HomePage {
     /**
      * Request some credentials to the DID application.
      */
-    console.log("Signing in with intent parameters:", intentParams);
-    let response = await intentPlugin.sendIntent("https://did.elastos.net/credaccess", intentParams);
-    console.log("Credential access response received", JSON.stringify(response))
-
-    if (response && response.result && response.result.presentation) {
+    console.log("Signing in with request parameters:", intentParams);
+    let didAccess = new DID.DIDAccess();
+    let presentation = await didAccess.getCredentials(intentParams);
+    if (presentation) {
       console.log("Received a presentation, so we are now signed in.");
-      let data = response.result;
-
       this.zone.run(()=>{
         this.navController.navigateForward("signedin", {
           queryParams: {
-            did: data.did,
-            presentation: response.result.presentation
+            did: presentation.getCredentials()[0].getIssuer(),
+            presentation: presentation
           }
         });
       });
@@ -84,5 +82,9 @@ export class HomePage {
 
   signData() {
     this.navController.navigateForward(["/sign"]);
+  }
+
+  forgetIdentityConnector() {
+    connectivity.setActiveConnector(null);
   }
 }
