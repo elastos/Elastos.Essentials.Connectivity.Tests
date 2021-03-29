@@ -1,0 +1,12 @@
+<ion-content>
+    <div class="container ion-padding ion-text-center" *ngIf="showCurrentImage">
+        <h2>{{ cid.slice(0,22) }} <br> {{ cid.slice(22, 48) }} </h2>
+        <img [src]="showCurrentImage" />
+        <h3>Size: {{ contentSize }}</h3>
+    </div>
+
+    <div class="container loader-container ion-padding ion-text-center" *ngIf="isShow">
+        <h1>Loading photo...</h1>
+        <div><ion-spinner name="bubbles"></ion-spinner></div>
+    </div>
+</ion-content>

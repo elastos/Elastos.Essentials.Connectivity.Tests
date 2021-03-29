@@ -1,0 +1,47 @@
+{
+    "id": "org.elastos.trinity.dapp.hivedemo",
+    "did": "did:elastos:iZSTQ5kixNs93XZMHHdvLNK6sQEdtwdoih",
+    "version": "1.1.2",
+    "version_code": 3,
+    "name": "Hive Demo",
+    "short_name": "Hive Demo",
+    "short_description": "Demo capsule for Hive in elastOS",
+    "description": "This capsule is for other capsule developers to discover how to use Hive 1.0 and save or get data to IPFS or OneDrive.",
+    "start_url": "index.html",
+    "type": "app",
+    "start_visible": "hide",
+    "category": "techdemo",
+    "icons": [{
+            "src": "assets/images/logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/images/logo.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        }
+    ],
+    "author": {
+        "name": "Trinity Tech Co., Ltd.",
+        "email": "contact@trinity-tech.io",
+        "website": "https://www.trinity-tech.io"
+    },
+    "default_locale": "en",
+    "plugins": [
+        "Device",
+        "NetworkStatus",
+        "Camera",
+        "HivePlugin",
+        "InAppBrowser"
+    ],
+    "urls": [
+        "http://login.microsoftonline.com/*",
+        "https://login.microsoftonline.com/*",
+        "http://graph.microsoft.com/*",
+        "https://graph.microsoft.com/*"
+    ],
+    "background_color": "#4e8ef7",
+    "theme_display": "show",
+    "theme_color": "#4e8ef7"
+}

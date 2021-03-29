@@ -1,0 +1,36 @@
+<ion-content>
+    <div class="list-container ion-text-center">
+        <h1>Files</h1>
+        <p>
+            The files api allows uploading, downloading files, getting file information, creating folders
+            and more, on a personal vault. This does not directly give access to another user's files. Hive scripts
+            must be used instead in that case.
+        </p>
+        
+        <div *ngIf="busy" class="spinner">
+            <ion-spinner ></ion-spinner>
+        </div>
+
+        <div *ngIf="operationResultInfo && !busy" class="result">
+            <h2>RESPONSE</h2>
+            <p>{{ operationResultInfo }}</p>
+        </div>
+        
+        <ion-card class="ion-padding" (click)="uploadFile()">
+            <ion-card-subtitle>Upload Text File</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="downloadFile()">
+            <ion-card-subtitle>Download Text File</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="getFileInfo()">
+            <ion-card-subtitle>Get File Info</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="deleteFile()">
+            <ion-card-subtitle>Delete File</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding upload-card">
+            <ion-card-subtitle>Upload Binary File</ion-card-subtitle>
+            <input type="file" id="ImageBinary" (change)="uploadBinaryFileChange($event)">
+        </ion-card>
+    </div>
+</ion-content>

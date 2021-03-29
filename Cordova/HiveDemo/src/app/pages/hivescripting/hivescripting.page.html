@@ -1,0 +1,52 @@
+<ion-content>
+    <div class="list-container ion-padding ion-text-center">
+        <h1>Scripting</h1>
+        <p>
+            The scripting api allows to interact with other users vaults, such as reading or writing
+            data, but adds an additional layer of protection. The target user vault
+            first makes sure access conditions are met (ex: users must be friends) before executing the given
+            list of executables.
+        </p>
+
+        <div *ngIf="busy" class="spinner">
+            <ion-spinner ></ion-spinner>
+        </div>
+
+        <div *ngIf="operationResultInfo && !busy" class="result">
+            <h2>RESPONSE</h2>
+            <p>{{ operationResultInfo }}</p>
+        </div>
+
+        <h2>Find One</h2>
+        <ion-card class="ion-padding" (click)="setScriptFindOneQuery()">
+            <ion-card-subtitle>Register Script</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="callScriptFindOneQuery()">
+            <ion-card-subtitle>Call Script</ion-card-subtitle>
+        </ion-card>
+
+        <h2>Insert (with condition)</h2>
+        <ion-card class="ion-padding" (click)="setScriptInsertQueryWithResultsCondition()">
+            <ion-card-subtitle>Register Script</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="callScriptInsertQueryWithResultsCondition()">
+            <ion-card-subtitle>Call Script</ion-card-subtitle>
+        </ion-card>
+
+        <h2>Upload File</h2>
+        <ion-card class="ion-padding" (click)="setScriptUploadFile()">
+            <ion-card-subtitle>Register Script</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="callScriptUploadFile()">
+            <ion-card-subtitle>Call Script</ion-card-subtitle>
+        </ion-card>
+
+        <h2>Download File</h2>
+        <ion-card class="ion-padding" (click)="setScriptDownloadFile()">
+            <ion-card-subtitle>Register script (anonymous ok)</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="callScriptDownloadFile()">
+            <ion-card-subtitle>Call Script</ion-card-subtitle>
+        </ion-card>
+    </div>
+</ion-content>

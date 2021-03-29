@@ -1,0 +1,54 @@
+.img-container, .loader-container {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h1 {
+        font-weight: 600;
+        font-size: 20px;
+        padding: 0;
+        letter-spacing: 1.5px;
+    }
+
+    ion-spinner {
+        color: #21313d;
+    }
+
+    img {
+        border-radius: 10px;
+        transform: rotate(90deg);
+    }
+
+    ion-button {
+        margin-top: 60px;
+        height: 40px;
+        width: 75%;
+        --border-radius: 20px;
+
+        ion-label {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 5.23;
+            letter-spacing: 1.52px;  
+        }
+    }
+}
+
+.list-container {
+    ion-button {
+        margin-top: 5px;
+        height: 40px;
+        width: 75%;
+        --border-radius: 20px;
+
+        ion-label {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 5.23;
+            letter-spacing: 1.52px;  
+        }
+    }
+}
+

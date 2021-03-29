@@ -1,0 +1,42 @@
+<ion-content>
+    <div class="list-container ion-padding ion-text-center">
+        <h1>Database</h1>
+        <p>
+            The database api allows to directly interface with your own data on your vault, after
+            a successful DID authentication. Databases of other users cannot be directly accessed - instead,
+            scripts must be used to get more refined control over what can be read or written by external
+            users.
+        </p>
+
+        <div *ngIf="busy" class="spinner">
+            <ion-spinner ></ion-spinner>
+        </div>
+
+        <div *ngIf="operationResultInfo && !busy" class="result">
+            <h2>RESPONSE</h2>
+            <p>{{ operationResultInfo }}</p>
+        </div>
+
+        <ion-card class="ion-padding" (click)="createCollection()">
+            <ion-card-subtitle>Create a Collection</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="deleteCollection()">
+            <ion-card-subtitle>Delete the Collection</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="getEntries()">
+            <ion-card-subtitle>Get Existing Entries</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="insertEntry()">
+            <ion-card-subtitle>Insert Entry</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="insertManyEntries()">
+            <ion-card-subtitle>Insert Multiple Entries</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="updateEntry()">
+            <ion-card-subtitle>Update Entry</ion-card-subtitle>
+        </ion-card>
+        <ion-card class="ion-padding" (click)="deleteEntry()">
+            <ion-card-subtitle>Delete Entry</ion-card-subtitle>
+        </ion-card>
+    </div>
+</ion-content>

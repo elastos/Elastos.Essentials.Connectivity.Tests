@@ -1,0 +1,52 @@
+<ion-content>
+
+    <div class="list-container ion-padding ion-text-center" *ngIf="!isShowCamera && !isShowUpload && currentImage === '' && cidArr.length > 0">
+        <ion-title>Stored Photos</ion-title>
+        <ion-card *ngFor="let item of cidArr" class="ion-padding" (click)="go(item.cid)">
+            <ion-card-subtitle>{{ item.cid.slice(0,15) }}...{{ item.cid.slice(35,50) }}</ion-card-subtitle>
+        </ion-card>
+    </div>
+
+    <div class="list-container ion-padding ion-text-center" *ngIf="!isShowCamera && !isShowUpload && currentImage === '' && cidArr.length === 0">
+        <ion-title>No Photos Yet!</ion-title>
+        <ion-button color="primary" (click)="takePicture()">
+            <ion-label>Upload</ion-label>
+        </ion-button>
+    </div>
+
+    <div class="img-container ion-padding ion-text-center" *ngIf="!isShowUpload && currentImage !== ''">
+        <img [src]="currentImage" *ngIf="currentImage">
+        <ion-button color="primary" (click)="putStringIpfs(currentImage)">
+            <ion-label>Upload</ion-label>
+        </ion-button>
+    </div>
+
+    <div class="loader-container ion-padding ion-text-center" *ngIf="isShowCamera">
+        <h1>Loading photo...</h1>
+        <div><ion-spinner name="bubbles"></ion-spinner></div>
+    </div>
+
+    <div class="loader-container ion-padding ion-text-center" *ngIf="isShowUpload">
+        <h1>Uploading photo...</h1>
+        <div><ion-spinner name="bubbles"></ion-spinner></div>
+    </div>
+    
+    <ion-fab class="ion-padding" vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button (click)="takePicture()" color="primary">
+            <ion-icon name="camera"></ion-icon>
+        </ion-fab-button>
+    </ion-fab>
+
+    <ion-fab class="ion-padding" vertical="bottom" horizontal="start" slot="fixed" *ngIf="!isShowUpload && currentImage !== ''">
+        <ion-fab-button (click)="reset()" color="primary">
+            <ion-icon name="refresh"></ion-icon>
+        </ion-fab-button>
+    </ion-fab>
+
+<!-- <ion-footer>
+  <ion-button (click)="hiveService.deleteStorage()">
+    <ion-label>Delete Visit</ion-label>
+  </ion-button>
+</ion-footer> -->
+
+</ion-content>

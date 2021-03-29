@@ -1,0 +1,77 @@
+.onboard-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 16px;
+    
+    img {
+      width: 135px;
+      height: 133px;
+    }
+  }
+
+  h1, p, .btn-container {
+    margin: 12px 0;
+    width: 366px;
+    padding: 0 16px;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.23;
+    letter-spacing: 0.3px;
+  }
+
+  p {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.56;
+    letter-spacing: 0.9px;
+  }
+
+  .btn-container {
+    ion-button {
+      --border-radius: 20px;
+      width: 100%;
+      height: 45px;
+
+      ion-label {
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 5.23;
+        letter-spacing: 1.52px;  
+      }
+    }
+  }
+}
+
+@media screen and (max-height: 640px) {
+  .onboard-container {  
+    .logo-container {
+      img {
+        width: 90px;
+        height: 89px;
+      }
+    }
+
+    h1, p, .btn-container {
+      width: 285px;
+    }
+
+    h1 {
+      font-size: 19.2px;
+    }
+  
+    p {
+      font-size: 11.5px;
+    }
+  }
+}

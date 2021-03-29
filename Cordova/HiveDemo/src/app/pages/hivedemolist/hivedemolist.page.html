@@ -1,0 +1,8 @@
+<ion-content>
+    <div class="list-container ion-padding ion-text-center">
+        <h1>Hive Demo List</h1>
+        <ion-card *ngFor="let item of demoList" class="ion-padding" (click)="go(item.type)">
+            <ion-card-subtitle>{{ item.name }}</ion-card-subtitle>
+        </ion-card>
+    </div>
+</ion-content>

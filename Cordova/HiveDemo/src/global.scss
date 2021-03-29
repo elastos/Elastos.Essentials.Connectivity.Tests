@@ -1,0 +1,144 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "~@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "~@ionic/angular/css/normalize.css";
+@import "~@ionic/angular/css/structure.css";
+@import "~@ionic/angular/css/typography.css";
+@import '~@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "~@ionic/angular/css/padding.css";
+@import "~@ionic/angular/css/float-elements.css";
+@import "~@ionic/angular/css/text-alignment.css";
+@import "~@ionic/angular/css/text-transformation.css";
+@import "~@ionic/angular/css/flex-utils.css";
+
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 300;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 400;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 500;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 600;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 700;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 800;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-ExtraBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Raleway';
+  font-weight: 900;
+  font-style: normal;
+  src: url('assets/fonts/Raleway-Black.ttf') format('truetype');
+}
+
+* {
+  font-family: 'Raleway' !important;
+}
+
+// Showing active tab in a different color
+:root {
+  ion-tab-button.tab-selected {
+    ion-icon, ion-label {
+      color: var(--ion-color-primary) !important;
+      --ion-color-base: var(--ion-color-primary) !important;
+    }
+  }
+}
+
+.list-container {
+  min-height: 100%;
+  padding: 10px 20px;
+
+  h1 {
+      font-weight: 900;
+      font-size: 24px;
+      padding: 0;
+      margin: 10px 0px;
+      color: #21313d;
+  }
+
+  p {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 0 20px;
+    letter-spacing: 1.5px;
+    margin: 10px 0px 30px;
+    color: #21313d;
+  }
+
+  h2 {
+    margin: 20px 0 10px;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .spinner {
+    margin-bottom: 20px;
+  }
+
+  .result {
+    border-radius: 20px;
+    padding: 15px 5px;
+    margin-bottom: 20px;
+    background: white;
+    box-shadow: 0 3px 15px 0 #ededf0;
+
+    h2 {
+      margin: 0;
+    }
+
+    p {
+      margin: 10px 0 0;
+      word-break: break-all;
+    }
+  }
+
+  ion-card {
+      border-radius: 30px;
+      background: linear-gradient(to bottom, #181d20 0%,  #21313d 100%);
+      margin: 10px;
+
+      ion-card-subtitle {
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 600;
+      }
+  }
+}
