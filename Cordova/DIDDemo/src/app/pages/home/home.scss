@@ -1,0 +1,50 @@
+.container {
+  min-height: 100%;
+  padding: 30px;
+
+  h2 {
+    font-weight: 800;
+    font-size: 24px;
+  }
+
+  ion-list {
+    ion-item {
+      --padding-start: 0px;
+      --inner-padding-end: 0px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: inset 0px -2px 0px 0px rgba(0, 0, 0, 0.11);
+
+      ion-icon {
+        font-size: 14px;
+        color: #21313d;
+      }
+
+      ion-label {
+        padding-left: 15px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.53;
+        white-space: pre-wrap !important;
+      }
+    }
+  }
+
+  .btn-row {
+    width: 100%;
+
+    ion-button {
+      height: 45px;
+      width: 100%;
+      --border-radius: 30px;
+      --box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.15);
+
+      ion-label {
+        text-transform: none;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.43px;
+      }
+    }
+  }
+}
+

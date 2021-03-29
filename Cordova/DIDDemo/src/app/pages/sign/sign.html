@@ -1,0 +1,35 @@
+<ion-content>
+  <app-titlebar></app-titlebar>
+  <div class="container" *ngIf="!dataSigned">
+    <h2 class="ion-no-margin ion-text-center">Signing Data</h2>
+    <p class="ion-text-center">
+      This demo case shows how to ask the Identity app to sign data using a selected DID.
+      In request, the Identity app will launch and you can sign various information such
+      as the signature itself and return it to this app by intent.
+    </p>
+    <ion-row class="btn-row" (click)="signSampleData()">
+      <ion-button color="primary">
+        <ion-label>Sign a sample 'hello'</ion-label>
+      </ion-button>
+    </ion-row>
+  </div>
+
+  <div class="container" *ngIf="dataSigned">
+    <h2 class="ion-no-margin ion-text-center">Your Data is Signed!</h2>
+    <ion-list>
+      <ion-item>
+        <ion-icon name="play" mode="ios"></ion-icon>
+        <ion-label> <b>DID:</b> {{ signResult.iss }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="play" mode="ios"></ion-icon>
+        <ion-label><b>Public Key:</b> {{ signResult.publickey }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="play" mode="ios"></ion-icon>
+        <ion-label><b>Signature:</b> {{ signResult.signature }}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+
