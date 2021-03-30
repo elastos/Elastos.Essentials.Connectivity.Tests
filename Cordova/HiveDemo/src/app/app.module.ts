@@ -12,26 +12,28 @@ import { IonicStorageModule } from '@ionic/storage';
 import { HiveDatabasePage } from './pages/hivedatabase/hivedatabase.page';
 import { HiveScriptingPage } from './pages/hivescripting/hivescripting.page';
 import { HiveFilesPage } from './pages/hivefiles/hivefiles.page';
-import { SignInPage } from './pages/signin/signin.page';
 import { AdvancedTestsPage } from './pages/advancedtests/advancedtests.page';
 import { OnboardPage } from './pages/onboard/onboard.page';
 import { HivedemolistPage } from './pages/hivedemolist/hivedemolist.page';
+import { ComponentsModule } from './components/components.module';
+import { SignInPage } from './pages/signin/signin.page';
 
 @NgModule({
   declarations: [
     MyApp,
     OnboardPage,
+    SignInPage,
     HivedemolistPage,
     HiveDatabasePage,
     HiveScriptingPage,
     HiveFilesPage,
-    SignInPage,
     AdvancedTestsPage
   ],
   imports: [
     CommonModule,
     BrowserModule,
     AppRoutingModule,
+    ComponentsModule,
     IonicModule.forRoot(),
     IonicStorageModule.forRoot()
   ],

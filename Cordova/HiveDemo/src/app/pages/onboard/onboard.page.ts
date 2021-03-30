@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
+import { TitleBarForegroundMode, TitleBarNavigationMode } from 'src/app/components/titlebar/titlebar.types';
 import { StorageService } from 'src/app/services/storage.service';
-
-declare let appManager: AppManagerPlugin.AppManager;
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
 
 @Component({
   selector: 'app-onboard',
@@ -11,7 +10,8 @@ declare let titleBarManager: TitleBarPlugin.TitleBarManager;
   styleUrls: ['./onboard.page.scss'],
 })
 export class OnboardPage implements OnInit {
-
+  @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
+  
   constructor(
     private storage: StorageService,
     private router: Router,
@@ -21,15 +21,10 @@ export class OnboardPage implements OnInit {
   }
 
   ionViewDidEnter(){
-    // When the main screen is ready to be displayed, ask the app manager to make the app visible,
-    // in case it was started hidden while loading.
-    appManager.setVisible("show");
-
     // Update system status bar every time we re-enter this screen.
-    titleBarManager.setBackgroundColor("#181d20");
+    this.titleBar.setBackgroundColor("#181d20");
     // TODO titleBarManager.setTitle('Hive Demo ' + this.hiveService.version.slice(16,19));
-    titleBarManager.setForegroundMode(TitleBarPlugin.TitleBarForegroundMode.LIGHT);
-    titleBarManager.setNavigationMode(TitleBarPlugin.TitleBarNavigationMode.HOME);
+    this.titleBar.setForegroundMode(TitleBarForegroundMode.LIGHT);
   }
 
   exit() {

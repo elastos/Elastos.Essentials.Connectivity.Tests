@@ -2,19 +2,16 @@ import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import { Router } from '@angular/router';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import * as TrinitySDK from '@elastosfoundation/trinity-dapp-sdk';
+import { DID, Hive } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { Events } from './events.service';
-
-declare let hiveManager: HivePlugin.HiveManager;
-declare let appManager: AppManagerPlugin.AppManager;
 
 @Injectable({
   providedIn: 'root'
 })
 export class HiveService {
-  private client: HivePlugin.Client;
-  private didHelper: TrinitySDK.DID.DIDHelper;
-  private hiveAuthHelper: TrinitySDK.Hive.AuthHelper;
+  private _client: HivePlugin.Client;
+  private didHelper: DID.DIDHelper;
+  private hiveAuthHelper: Hive.AuthHelper;
   private vaultsMap = new Map<string, HivePlugin.Vault>();
 
   constructor(
@@ -28,11 +25,19 @@ export class HiveService {
   async init() {
     console.log("Initializing the hive service");
 
-    this.hiveAuthHelper = new TrinitySDK.Hive.AuthHelper();
-    this.client = await this.hiveAuthHelper.getClientWithAuth((e)=>{
-      // Auth error
-      this.events.publish("autherror", e);
-    })
+    this.hiveAuthHelper = new Hive.AuthHelper();
+  }
+
+  private async getOrCreateClient(): Promise<HivePlugin.Client> {
+    if (!this._client) {
+      this._client = await this.hiveAuthHelper.getClientWithAuth((e)=>{
+        // Auth error
+        this.events.publish("autherror", e);
+      });
+      console.log("A new hive client was created", this._client);
+    }
+
+    return this._client;
   }
 
   public async getSelfDID(): Promise<string> {
@@ -56,10 +61,11 @@ export class HiveService {
         return;
       }
 
-      vault = await this.client.getVault(vaultOwnerDid);
+      let client = await this.getOrCreateClient();
+      vault = await client.getVault(vaultOwnerDid);
 
       if (!vault) {
-        await TrinitySDK.Hive.HiveHelper.suggestUserToSetupVault();
+        await Hive.HiveHelper.suggestUserToSetupVault();
       }
       else {
         console.log("Resolved vault "+vaultOwnerDid+" from DID Document.");

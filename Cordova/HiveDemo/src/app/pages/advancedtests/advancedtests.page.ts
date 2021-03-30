@@ -1,13 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HiveDemoService } from 'src/app/services/hivedemo.service';
 import { HiveService } from 'src/app/services/hive.service';
 import { Events } from 'src/app/services/events.service';
-
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
-declare let hiveManager: HivePlugin.HiveManager;
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
 
 @Component({
   selector: 'app-advancedtests',
@@ -15,6 +13,8 @@ declare let hiveManager: HivePlugin.HiveManager;
   styleUrls: ['./advancedtests.page.scss'],
 })
 export class AdvancedTestsPage implements OnInit {
+  @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
+
   public operationResultInfo: string = "";
   public busy: boolean = false;
 
@@ -35,15 +35,15 @@ export class AdvancedTestsPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.hiveDemoService.setTitleBarBackKeyShown(true);
+    this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, true);
+    this.titleBar.setTitle('Demo: Files');
   }
 
   ionViewDidEnter() {
-    titleBarManager.setTitle('Demo: Files');
   }
 
   ionViewWillLeave() {
-    this.hiveDemoService.setTitleBarBackKeyShown(false);
+    this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, false);
   }
 
   private showBusy() {

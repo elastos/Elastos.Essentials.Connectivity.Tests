@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController, AlertController} from '@ionic/angular';
 import { NgZone} from '@angular/core';
 import { Router } from '@angular/router';
-
-declare let appManager: AppManagerPlugin.AppManager;
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
+import { TitleBarForegroundMode } from 'src/app/components/titlebar/titlebar.types';
 
 enum DemoType {
   HIVE_DATABASE = 3,
@@ -19,6 +18,8 @@ enum DemoType {
   styleUrls: ['./hivedemolist.page.scss'],
 })
 export class HivedemolistPage implements OnInit {
+  @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
+  
   // Demo List
   public demoList: {name:string, type: DemoType}[] = [
     { "name": 'Database', "type": DemoType.HIVE_DATABASE },
@@ -38,14 +39,10 @@ export class HivedemolistPage implements OnInit {
   }
 
   ionViewWillEnter(){
-    // When the main screen is ready to be displayed, ask the app manager to make the app visible,
-    // in case it was started hidden while loading.
-    appManager.setVisible("show");
-
     // Update system status bar every time we re-enter this screen.
-    titleBarManager.setTitle('Demo List');
-    titleBarManager.setBackgroundColor("#181d20");
-    titleBarManager.setForegroundMode(TitleBarPlugin.TitleBarForegroundMode.LIGHT);
+    this.titleBar.setTitle('Demo List');
+    this.titleBar.setBackgroundColor("#181d20");
+    this.titleBar.setForegroundMode(TitleBarForegroundMode.LIGHT);
   }
 
   /*

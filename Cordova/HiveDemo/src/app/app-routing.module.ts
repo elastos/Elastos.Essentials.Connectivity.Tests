@@ -3,10 +3,10 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { HiveDatabasePage } from './pages/hivedatabase/hivedatabase.page';
 import { HiveScriptingPage } from './pages/hivescripting/hivescripting.page';
 import { HiveFilesPage } from './pages/hivefiles/hivefiles.page';
-import { SignInPage } from './pages/signin/signin.page';
 import { AdvancedTestsPage } from './pages/advancedtests/advancedtests.page';
 import { OnboardPage } from './pages/onboard/onboard.page';
 import { HivedemolistPage } from './pages/hivedemolist/hivedemolist.page';
+import { SignInPage } from './pages/signin/signin.page';
 
 const routes: Routes = [
   { path: 'signin', component: SignInPage },

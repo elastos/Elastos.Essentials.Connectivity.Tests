@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController, AlertController} from '@ionic/angular';
 import { NgZone} from '@angular/core';
 import { StorageService } from 'src/app/services/storage.service';
-
-declare let appManager: AppManagerPlugin.AppManager;
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
-declare let didManager: DIDPlugin.DIDManager;
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
+import { DID, connectivity } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { TitleBarForegroundMode } from 'src/app/components/titlebar/titlebar.types';
 
 @Component({
   selector: 'app-signin',
@@ -13,6 +12,8 @@ declare let didManager: DIDPlugin.DIDManager;
   styleUrls: ['./signin.page.scss'],
 })
 export class SignInPage implements OnInit {
+  @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
+
   constructor(
     public navCtrl: NavController,
     public zone: NgZone,
@@ -24,38 +25,39 @@ export class SignInPage implements OnInit {
   }
 
   ionViewDidEnter(){
-    appManager.setVisible("show");
-
     // Update system status bar every time we re-enter this screen.
-    titleBarManager.setTitle('Hive Demo');
-    titleBarManager.setBackgroundColor("#181d20");
-    titleBarManager.setForegroundMode(TitleBarPlugin.TitleBarForegroundMode.LIGHT);
-    titleBarManager.setNavigationMode(TitleBarPlugin.TitleBarNavigationMode.CLOSE);
+    this.titleBar.setTitle('Hive Demo');
+    this.titleBar.setBackgroundColor("#181d20");
+    this.titleBar.setForegroundMode(TitleBarForegroundMode.LIGHT);
   }
 
-  signIn() {
-    appManager.sendIntent("credaccess", {
-      claims: {}
-    }, {
-      // TODO - RESTORE AFTER NATIVE CRASH (dongxiao) appId: "org.elastos.trinity.dapp.did" // Force receiving by the DID app
-    }, async (response: {result: { did: string, presentation: string }})=>{
-      console.log("Got credaccess response:", response);
-      if (response && response.result.did) {
-        console.log("Got DID info. Saving it and going to next screen");
+  async signIn() {
+    // Force picking a connector every time we need to sign in, just in case.
+    await connectivity.setActiveConnector(null);
 
-        // We are "signed in". Save the DID to local storage.
-        await this.storage.setSignedInDID(response.result.did);
+    let didAccess = new DID.DIDAccess();
+    let presentation = await didAccess.getCredentials(
+      {
+        claims:{
+          name: true
+        }
+      }
+    );
 
-        // Now to the next expected screen
-        this.zone.run(()=>{
-          this.navCtrl.navigateForward("hivedemolist");
-        });
-      }
-      else {
-        console.warn("No DID field returned by credaccess, there is something wrong.");
-      }
-    }, (err)=>{
-      console.error(err);
-    })
+    if (presentation) {
+      console.log("Got DID info. Saving it and going to next screen");
+
+      // We are "signed in". Save the DID to local storage.
+      let did = presentation.getCredentials()[0].getSubject();
+      await this.storage.setSignedInDID(did);
+
+      // Now to the next expected screen
+      this.zone.run(()=>{
+        this.navCtrl.navigateForward("hivedemolist");
+      });
+    }
+    else {
+      console.warn("No DID field returned by credaccess, there is something wrong.");
+    }
   }
 }

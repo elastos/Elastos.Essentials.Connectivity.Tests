@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { NavController } from '@ionic/angular';
-
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
+import { TitleBarComponent } from '../components/titlebar/titlebar.component';
+import { TitleBarIconSlot } from '../components/titlebar/titlebar.types';
 
 @Injectable({
     providedIn: 'root'
@@ -13,24 +13,25 @@ export class HiveDemoService {
 
     init() {
         console.log("HiveDemoService service init");
-
-        titleBarManager.setForegroundMode(TitleBarPlugin.TitleBarForegroundMode.LIGHT);
-        titleBarManager.addOnItemClickedListener((menuIcon)=>{
-          if (menuIcon.key == "back") {
-              this.navController.back();
-          }
-        });
     }
 
-    setTitleBarBackKeyShown(show: boolean) {
+    setTitleBarBackKeyShown(titleBar: TitleBarComponent, show: boolean) {
       if (show) {
-          titleBarManager.setIcon(TitleBarPlugin.TitleBarIconSlot.INNER_LEFT, {
+          titleBar.setIcon(TitleBarIconSlot.OUTER_LEFT, {
               key: "back",
-              iconPath: TitleBarPlugin.BuiltInIcon.BACK
+              iconPath: "assets/icons/back.svg"
           });
+          this.registerBackKey(titleBar);
       }
       else {
-          titleBarManager.setIcon(TitleBarPlugin.TitleBarIconSlot.INNER_LEFT, null);
+          titleBar.setIcon(TitleBarIconSlot.OUTER_LEFT, null);
       }
+    }
+
+    public registerBackKey(titleBar: TitleBarComponent) {
+        titleBar.addOnItemClickedListener((icon)=>{
+            if (icon.key == "back")
+                this.navController.back();
+        });
     }
 }

@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { NgZone} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HiveDemoService } from 'src/app/services/hivedemo.service';
-
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
 
 @Component({
   selector: 'app-picturedetails',
@@ -12,6 +11,7 @@ declare let titleBarManager: TitleBarPlugin.TitleBarManager;
   styleUrls: ['./picturedetails.page.scss'],
 })
 export class PicturedetailsPage implements OnInit {
+    @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
 
     public cid:string = "";
     public contentSize: string = "";
@@ -49,11 +49,11 @@ export class PicturedetailsPage implements OnInit {
     }
 
     ionViewWillEnter() {
-      this.hiveDemoService.setTitleBarBackKeyShown(true);
+      this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, true);
     }
 
     ionViewWillLeave() {
-      this.hiveDemoService.setTitleBarBackKeyShown(false);
+      this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, false);
     }
 
     getStringIpfs(cid:string):void{

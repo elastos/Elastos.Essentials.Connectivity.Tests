@@ -1,11 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { NgZone} from '@angular/core';
 import { HiveDemoService } from 'src/app/services/hivedemo.service';
-
-declare let appManager: AppManagerPlugin.AppManager;
-declare let titleBarManager: TitleBarPlugin.TitleBarManager;
-
+import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
+import { TitleBarForegroundMode } from 'src/app/components/titlebar/titlebar.types';
 
 @Component({
   selector: 'app-picturelist',
@@ -13,7 +11,8 @@ declare let titleBarManager: TitleBarPlugin.TitleBarManager;
   styleUrls: ['./picturelist.page.scss'],
 })
 export class PicturelistPage implements OnInit {
-
+  @ViewChild(TitleBarComponent, { static: true }) titleBar: TitleBarComponent;
+  
   public cidArr: any;
   public currentImage: string = "";
 
@@ -35,13 +34,9 @@ export class PicturelistPage implements OnInit {
   }
 
   ionViewDidEnter() {
-    // When the main screen is ready to be displayed, ask the app manager to make the app visible,
-    // in case it was started hidden while loading.
-    appManager.setVisible("show");
-
     // Update system status bar every time we re-enter this screen.
     // TODO titleBarManager.setTitle('Hive Demo ' + this.hiveService.version.slice(16,19));
-    titleBarManager.setForegroundMode(TitleBarPlugin.TitleBarForegroundMode.LIGHT);
+    this.titleBar.setForegroundMode(TitleBarForegroundMode.LIGHT);
 
     /* TODO console.log("==msg==" + this.ipfsObj);
     if(this.ipfsObj === null){
@@ -54,11 +49,11 @@ export class PicturelistPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.hiveDemoService.setTitleBarBackKeyShown(true);
+    this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, true);
   }
 
   ionViewWillLeave() {
-    this.hiveDemoService.setTitleBarBackKeyShown(false);
+    this.hiveDemoService.setTitleBarBackKeyShown(this.titleBar, false);
   }
 
   takePicture():void {
@@ -71,7 +66,7 @@ export class PicturelistPage implements OnInit {
       mediaType:0
     };
 
-    navigator.camera.getPicture((imageData) => {
+    /* TODO navigator.camera.getPicture((imageData) => {
       this.zone.run(() => {
         this.isShowCamera = false;
         this.currentImage = 'data:image/png;base64,' + imageData;
@@ -80,7 +75,7 @@ export class PicturelistPage implements OnInit {
       this.isShowCamera = false;
       console.log("Camera issue: " + err);
       this.currentImage ="";
-    }), options);
+    }), options);*/
   }
 
   putStringIpfs(content: string):void {

@@ -1,4 +1,5 @@
 <ion-content>
+    <app-titlebar></app-titlebar>
     <div class="container ion-padding ion-text-center" *ngIf="showCurrentImage">
         <h2>{{ cid.slice(0,22) }} <br> {{ cid.slice(22, 48) }} </h2>
         <img [src]="showCurrentImage" />
