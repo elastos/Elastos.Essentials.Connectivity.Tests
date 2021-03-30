@@ -34,7 +34,7 @@
                 "glob": "**/*",
                 "input": "./node_modules/@elastosfoundation/elastos-connector-localidentity-cordova/dist/assets",
                 "output": "assets"
-            }
+              }
             ],
             "styles": [
               {
