@@ -50,7 +50,7 @@
     "@angular/compiler-cli": "^11.0.7",
     "@angular/language-service": "^11.0.7",
     "@elastosfoundation/elastos-cordova-plugin-did": "^1.0.0",
-    "@elastosfoundation/elastos-cordova-plugin-intent": "^1.0.0",
+    "@elastosfoundation/elastos-cordova-plugin-intent": "^1.0.2",
     "@ionic/angular-toolkit": "^3.0.0",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
@@ -81,7 +81,7 @@
       "cordova-plugin-ionic-keyboard": {},
       "elastos-cordova-plugin-did": {},
       "elastos-cordova-plugin-hive": {},
-      "elastos-cordova-plugin-intent": {}
+      "@elastosfoundation/elastos-cordova-plugin-intent": {}
     },
     "platforms": [
       "android"
