@@ -4,7 +4,7 @@ import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cor
 import { LocalIdentityConnector, localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
 
 declare let didManager: DIDPlugin.DIDManager;
-declare let intentPlugin: IntentPlugin.Intent;
+declare let intentManager: IntentPlugin.IntentManager;
 declare let hiveManager: HivePlugin.HiveManager;
 
 @Component({
@@ -17,9 +17,10 @@ export class HomePage {
   private essentialsConnector = new EssentialsConnector();
 
   constructor() {
-    intentPlugin.addIntentListener((ret) => {
+    intentManager.addIntentListener((ret) => {
       this.onIntentReceived(ret);
     });
+    console.log('intentManager.addIntentListener');
 
     connectivity.registerConnector(this.localIdentityConnector);
     connectivity.registerConnector(this.essentialsConnector);
@@ -34,7 +35,7 @@ export class HomePage {
     console.log('Received intent', intent);
     try {
       console.log("sendIntentResponse");
-      await intentPlugin.sendIntentResponse({b:"2"}, intent.intentId);
+      await intentManager.sendIntentResponse({b:"2"}, intent.intentId);
     }
     catch (e) {
         console.error("sendIntentResponse error:", e);
@@ -46,10 +47,10 @@ export class HomePage {
     console.log("test Intent");
 
     try {
-      let ret = await intentPlugin.sendIntent("https://scanner.elastos.net/scanqrcode", {a: 1});
+      let ret = await intentManager.sendIntent("https://scanner.elastos.net/scanqrcode", {a: 1});
       console.log('intent response:', ret);
       console.log("sendUrlIntent");
-      await intentPlugin.sendUrlIntent("https://did.elastos.net/credaccess/eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcVduUFJLWTltTktvUmRETXJrSGRlRHBRQmk0WnRvekQ0IiwiY2FsbGJhY2t1cmwiOiJodHRwczovL2FwaS5jeWJlcnJlcHVibGljLm9yZy9hcGkvdXNlci9sb2dpbi1jYWxsYmFjay1lbGEiLCJub25jZSI6IjZiNzkyZDVhLTBlYTItNDU4MC1hYWY2LWRiM2FjZjA2OGZiMiIsImNsYWltcyI6e30sIndlYnNpdGUiOnsiZG9tYWluIjoiaHR0cHM6Ly93d3cuY3liZXJyZXB1YmxpYy5vcmciLCJsb2dvIjoiaHR0cHM6Ly93d3cuY3liZXJyZXB1YmxpYy5vcmcvYXNzZXRzL2ltYWdlcy9jcl9lbGFfd2FsbGV0LnN2ZyJ9LCJpYXQiOjE2MTUxODYyNzUsImV4cCI6MTYxNTc5MTA3NX0._ppCH7YHd5SVoZHZI2YeYww6OlAjf5GIG3QqqSXf5rMw8oBmvdF7Nld_WMvnVQUvSnmnadRPZsYW66-Zi7T1Fg ");
+      await intentManager.sendUrlIntent("https://did.elastos.net/credaccess/eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJkaWQ6ZWxhc3RvczppcVduUFJLWTltTktvUmRETXJrSGRlRHBRQmk0WnRvekQ0IiwiY2FsbGJhY2t1cmwiOiJodHRwczovL2FwaS5jeWJlcnJlcHVibGljLm9yZy9hcGkvdXNlci9sb2dpbi1jYWxsYmFjay1lbGEiLCJub25jZSI6IjZiNzkyZDVhLTBlYTItNDU4MC1hYWY2LWRiM2FjZjA2OGZiMiIsImNsYWltcyI6e30sIndlYnNpdGUiOnsiZG9tYWluIjoiaHR0cHM6Ly93d3cuY3liZXJyZXB1YmxpYy5vcmciLCJsb2dvIjoiaHR0cHM6Ly93d3cuY3liZXJyZXB1YmxpYy5vcmcvYXNzZXRzL2ltYWdlcy9jcl9lbGFfd2FsbGV0LnN2ZyJ9LCJpYXQiOjE2MTUxODYyNzUsImV4cCI6MTYxNTc5MTA3NX0._ppCH7YHd5SVoZHZI2YeYww6OlAjf5GIG3QqqSXf5rMw8oBmvdF7Nld_WMvnVQUvSnmnadRPZsYW66-Zi7T1Fg ");
     }
     catch (e) {
       console.error("sendIntent error:", e);
