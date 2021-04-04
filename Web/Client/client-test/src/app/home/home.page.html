@@ -1,0 +1,37 @@
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Web client test</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
+    <br/>
+    <ion-button (click)="testPay()">test Pay</ion-button>
+    <br/>
+    <!--<ion-button (click)="testHiveAuth()">Hive Auth</ion-button>
+    <br/>
+    <ion-button (click)="unselectActiveConnector()">Forget current connector</ion-button>
+    <br/>
+    <ion-button (click)="revokeHiveAuthToken()">Forget hive auth token</ion-button>
+    <br/>
+    <ion-button (click)="deleteLocalStorage()">Delete local storage (instance DIDs, local identity etc)</ion-button>
+    <br/>
+    <ion-button (click)="manageLocalIdentity()">Manage local identity</ion-button>
+    <br/>
+    <ion-button (click)="setLanguage('en')">Language: EN</ion-button>
+    <ion-button (click)="setLanguage('fr')">Language: FR</ion-button>
+    <ion-button (click)="setLanguage('zh')">Language: ZH</ion-button>
+    <br/>
+    <ion-button (click)="setDarkMode(false)">Light theme mode</ion-button>
+    <ion-button (click)="setDarkMode(true)">Dark theme mode</ion-button>
+    <br/>
+    <ion-button (click)="registerEssentialsConnector()">Connector: register Essentials</ion-button>
+    <ion-button (click)="unregisterEssentialsConnector()">Connector: unregister Essentials</ion-button>
+    <br/>
+    <ion-button (click)="registerLocalConnector()">Connector: register Local identity</ion-button>
+    <ion-button (click)="unregisterLocalConnector()">Connector: unregister Local identity</ion-button>-->
+    <ion-button (click)="testUnlinkEssentialsConnection()">Unlink connection to Essentials </ion-button>
+  </div>
+</ion-content>

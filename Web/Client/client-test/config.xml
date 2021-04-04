@@ -1,7 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="org.elastos.demos.hive" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Hive Demo</name>
-    <description />
+<widget id="net.elastos.essentials.cordova.test01" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Web client test</name>
+    <description>An awesome Ionic/Cordova app.</description>
+    <author email="contact@trinity-tech.io" href="https://www.trinity-tech.io">
+        Trinity Tech Co., Ltd.
+    </author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
@@ -10,7 +13,8 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <preference name="AndroidLaunchMode" value="singleTask" />
+    <allow-navigation href="http://*/*" />
+    <allow-navigation href="https://*/*" />
     <preference name="ScrollEnabled" value="false" />
     <preference name="BackupWebStorage" value="none" />
     <preference name="SplashMaintainAspectRatio" value="true" />
@@ -18,19 +22,21 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="3000" />
-    <preference name="IntentRedirecturlFilter" value="hivedemo://intentresponse" />
+    <preference name="IntentRedirecturlFilter" value="https://test01.cordova.sdk.elastos.net" />
     <platform name="android">
-        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:networkSecurityConfig="@xml/network_security_config" />
-        </edit-config>
         <config-file parent="/manifest/application/activity" target="AndroidManifest.xml">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="intentresponse" android:pathPattern="/.*" android:scheme="hivedemo" />
+                <data android:host="test01.cordova.sdk.elastos.net" android:pathPattern="/.*" android:scheme="https" />
             </intent-filter>
         </config-file>
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:allowBackup="false" android:fullBackupContent="false" android:networkSecurityConfig="@xml/network_security_config" android:usesCleartextTraffic="true">
+                <uses-library android:name="org.apache.http.legacy" android:required="false" />
+            </application>
+        </edit-config>
         <resource-file src="resources/android/xml/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
         <allow-intent href="market:*" />
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
@@ -112,5 +118,5 @@
     <plugin name="cordova-plugin-splashscreen" spec="5.0.2" />
     <plugin name="cordova-plugin-ionic-webview" spec="^4.0.0" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
-    <allow-navigation href="http://0.0.0.0:8101" sessionid="1a3411cf" />
+    <allow-navigation href="https://0.0.0.0:8100" sessionid="6852b290" />
 </widget>

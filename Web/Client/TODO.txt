@@ -1,7 +1,0 @@
-
-Write a simple ionic web client that imports the elastos connectivity SDK, the essentials
-connector and deals with local identity and essentials identity sign in, hive, payments, contracts, etc.
-
-This client should have 2 modes:
-- Full mode (priority 1), to be used with a server. In this case, QR codes are used only to initiate a link to essentials, and scanned only once.
-- Serverless mode (priority 2), to be used without a server (in this case, a qr code must be scaned every time an operation requires user's wallet interaction).
