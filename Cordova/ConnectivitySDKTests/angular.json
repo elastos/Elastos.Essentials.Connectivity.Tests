@@ -39,9 +39,9 @@
               },
               {
                 "glob": "**/*",
-                "input": "./node_modules/@elastosfoundation/elastos-connectivity-sdk-cordova/dist.esm/assets",
+                "input": "./node_modules/@elastosfoundation/elastos-connector-localidentity-cordova/dist.esm/assets",
                 "output": "assets"
-              }
+              },
             ],
             "styles": [
               "src/theme/variables.scss",
