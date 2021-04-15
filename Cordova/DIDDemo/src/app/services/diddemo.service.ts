@@ -3,7 +3,7 @@ import { Platform, ToastController } from '@ionic/angular';
 import { NavController } from '@ionic/angular';
 import { TitleBarComponent } from '../components/titlebar/titlebar.component';
 
-declare let intentPlugin: IntentPlugin.Intent;
+declare let intentManager: IntentPlugin.IntentManager;
 
 let managerService = null;
 
@@ -28,7 +28,7 @@ export class DIDDemoService {
         // Load app manager only on real device, not in desktop browser - beware: ionic 4 bug with "desktop" or "android"/"ios"
         if (this.platform.platforms().indexOf("cordova") >= 0) {
             console.log("Listening to intent events")
-            intentPlugin.addIntentListener((intent: IntentPlugin.ReceivedIntent)=>{
+            intentManager.addIntentListener((intent: IntentPlugin.ReceivedIntent)=>{
                 this.onReceiveIntent(intent);
             });
         }

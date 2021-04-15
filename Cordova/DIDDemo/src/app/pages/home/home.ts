@@ -5,7 +5,7 @@ import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.componen
 import { TitleBarIconSlot } from 'src/app/components/titlebar/titlebar.types';
 import { DID, connectivity } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 
-declare let intentPlugin: IntentPlugin.Intent;
+declare let intentManager: IntentPlugin.IntentManager;
 
 @Component({
   selector: 'page-home',

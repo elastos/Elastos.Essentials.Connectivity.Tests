@@ -8,7 +8,7 @@ import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.componen
 import { TitleBarIconSlot } from 'src/app/components/titlebar/titlebar.types';
 
 declare let didManager: DIDPlugin.DIDManager;
-declare let intentPlugin: IntentPlugin.Intent;
+declare let intentManager: IntentPlugin.IntentManager;
 
 @Component({
   selector: 'page-signedin',
@@ -93,7 +93,7 @@ export class SignedInPage {
      * to our own DID profile (which is a useless use case, as usually DIDs are issued for others).
      */
     try {
-      let response = await intentPlugin.sendIntent("https://did.elastos.net/credissue", {
+      let response = await intentManager.sendIntent("https://did.elastos.net/credissue", {
         identifier: "customcredentialkey", // unique identifier for this credential
         types: ["MyCredentialType"], // Additional credential types (strings) such as BasicProfileCredential.
         subjectdid: this.did, // DID targeted by the created credential. Only that did will be able to import the credential.

@@ -6,7 +6,7 @@ import { DIDDemoService } from 'src/app/services/diddemo.service';
 import { TitleBarComponent } from 'src/app/components/titlebar/titlebar.component';
 import { TitleBarIconSlot } from 'src/app/components/titlebar/titlebar.types';
 
-declare let intentPlugin: IntentPlugin.Intent;
+declare let intentManager: IntentPlugin.IntentManager;
 
 @Component({
   selector: 'page-credissued',
@@ -54,7 +54,7 @@ export class CredIssuedPage {
      * (ourself issued a credential to ourself).
      */
     try {
-      await intentPlugin.sendIntent("https://did.elastos.net/credimport", {
+      await intentManager.sendIntent("https://did.elastos.net/credimport", {
           credentials: [ // We can import several credentials at a time if needed
             credentialAsObject
           ]
