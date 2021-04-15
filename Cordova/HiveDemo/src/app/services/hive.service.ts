@@ -65,7 +65,7 @@ export class HiveService {
       vault = await client.getVault(vaultOwnerDid);
 
       if (!vault) {
-        await Hive.HiveHelper.suggestUserToSetupVault();
+        console.log("Could not resolve vault for "+vaultOwnerDid+".");
       }
       else {
         console.log("Resolved vault "+vaultOwnerDid+" from DID Document.");

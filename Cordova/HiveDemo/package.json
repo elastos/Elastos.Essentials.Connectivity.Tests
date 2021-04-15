@@ -31,6 +31,7 @@
     "@ionic/angular": "^5.5.2",
     "@ionic/storage": "~2.2.0",
     "@types/node": "^8.10.65",
+    "cordova-android": "9.1.0",
     "core-js": "^2.5.4",
     "moment": "^2.29.1",
     "nan": "^2.14.2",
@@ -54,7 +55,6 @@
     "@ionic/angular-toolkit": "^3.0.0",
     "@types/jasmine": "~3.3.8",
     "@types/jasminewd2": "~2.0.3",
-    "cordova-android": "^9.0.0",
     "cordova-plugin-device": "2.0.2",
     "cordova-plugin-ionic-keyboard": "^2.0.5",
     "cordova-plugin-ionic-webview": "^4.0.0",
@@ -71,6 +71,7 @@
     "plugins": {
       "@elastosfoundation/elastos-cordova-plugin-did": {},
       "@elastosfoundation/elastos-cordova-plugin-hive": {},
+      "@elastosfoundation/elastos-cordova-plugin-intent": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-statusbar": {},
       "cordova-plugin-device": {},
@@ -78,10 +79,7 @@
       "cordova-plugin-ionic-webview": {
         "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
       },
-      "cordova-plugin-ionic-keyboard": {},
-      "elastos-cordova-plugin-did": {},
-      "elastos-cordova-plugin-hive": {},
-      "@elastosfoundation/elastos-cordova-plugin-intent": {}
+      "cordova-plugin-ionic-keyboard": {}
     },
     "platforms": [
       "android"
