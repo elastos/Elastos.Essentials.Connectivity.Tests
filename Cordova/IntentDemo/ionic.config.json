@@ -1,0 +1,7 @@
+{
+  "name": "IntentDemo",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
