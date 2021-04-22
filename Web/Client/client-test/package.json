@@ -22,9 +22,13 @@
     "@elastosfoundation/elastos-connectivity-sdk-cordova": "^1.0.16",
     "@elastosfoundation/essentials-connector-client-browser": "file:../ess-connector-client-browser",
     "@ionic/angular": "^5.5.2",
+    "@walletconnect/web3-provider": "^1.4.1",
+    "crypto-browserify": "^3.12.0",
     "moment": "^2.29.1",
     "rxjs": "~6.6.0",
+    "stream-browserify": "^2.0.2",
     "tslib": "^2.0.0",
+    "web3": "^1.3.5",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
@@ -47,11 +51,17 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "moment-locales-webpack-plugin": "^1.2.0",
     "native-run": "^1.3.0",
     "protractor": "~7.0.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.0.2"
+  },
+  "browser": {
+    "http": false,
+    "https": false,
+    "os": false
   },
   "description": "An Ionic project"
 }
