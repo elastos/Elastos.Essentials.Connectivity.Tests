@@ -18,7 +18,8 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="3000" />
-    <preference name="InternalIntentFilter" value="https://did.elastos.net https://wallet.elastos.net https://hive.elastos.net https://contact.elastos.net https://scanner.elastos.net" />
+    <preference name="InternalIntentFilters" value="https://did.elastos.net https://wallet.elastos.net https://hive.elastos.net https://contact.elastos.net https://scanner.elastos.net" />
+    <preference name="RawUrlIntentFilters" value="wc: https://wallet.elastos.net/wc:" />
     <preference name="IntentRedirecturlFilter" value="https://essentials.elastos.net" />
     <platform name="android">
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
