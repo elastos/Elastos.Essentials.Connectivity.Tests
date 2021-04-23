@@ -11,6 +11,8 @@ import Web3, {  } from "web3";
 })
 export class HomePage {
   private essentialsConnector = new EssentialsConnector();
+  private walletConnectProvider: WalletConnectProvider;
+  private walletConnectWeb3: Web3;
 
   constructor() {
     this.essentialsConnector.setLinkType(LinkType.Connected);
@@ -84,105 +86,87 @@ export class HomePage {
     console.log("pay respone", response);
   }
 
-  private getWalletConnectProvider(): WalletConnectProvider {
+  private async setupWalletConnectProvider() {
     //  Create WalletConnect Provider
-    const provider = new WalletConnectProvider({
+    this.walletConnectProvider = new WalletConnectProvider({
       rpc: {
         20: "https://testnet.elastos.io/eth",
         21: "https://api-testnet.elastos.io/eth",
       },
       //bridge: "http://192.168.1.3/"
-      bridge: "http://192.168.1.3:5001"
+      bridge: "http://192.168.31.114:5001"
     });
-    return provider;
-  }
 
-  // https://docs.walletconnect.org/quick-start/dapps/web3-provider
-  public async testWalletConnectConnect() {
-    let provider = this.getWalletConnectProvider();
-
-    console.log("Connected?", provider.connected);
+    console.log("Connected?", this.walletConnectProvider.connected);
 
     // Subscribe to accounts change
-    provider.on("accountsChanged", (accounts: string[]) => {
+    this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
       console.log(accounts);
     });
 
     // Subscribe to chainId change
-    provider.on("chainChanged", (chainId: number) => {
+    this.walletConnectProvider.on("chainChanged", (chainId: number) => {
       console.log(chainId);
     });
 
     // Subscribe to session disconnection
-    provider.on("disconnect", (code: number, reason: string) => {
+    this.walletConnectProvider.on("disconnect", (code: number, reason: string) => {
       console.log(code, reason);
     });
 
     // Subscribe to session disconnection
-    provider.on("error", (code: number, reason: string) => {
+    this.walletConnectProvider.on("error", (code: number, reason: string) => {
       console.error(code, reason);
     });
 
     //  Enable session (triggers QR Code modal)
     console.log("Connecting to wallet connect");
-    let enabled = await provider.enable();
+    let enabled = await this.walletConnectProvider.enable();
     console.log("CONNECTED to wallet connect", enabled);
 
-    const web3 = new Web3(provider as any); // HACK
+    this.walletConnectWeb3 = new Web3(this.walletConnectProvider as any); // HACK
+  }
+
+  // https://docs.walletconnect.org/quick-start/dapps/web3-provider
+  public async testWalletConnectConnect() {
+    await this.setupWalletConnectProvider();
 
     //  Get Chain Id
-    const chainId = await web3.eth.getChainId();
+    const chainId = await this.walletConnectWeb3.eth.getChainId();
     console.log("Chain ID: ", chainId);
 
     if (chainId != 20 && chainId != 21) {
       console.error("ERROR: Connected to wrong ethereum network "+chainId+". Not an elastos network. Check that the wallet app is using an Elastos network.");
       return;
     }
+  }
 
-    /*
+  public async testWalletConnectCustomRequest() {
     interface RequestArguments {
       method: string;
       params?: unknown[] | object;
     }
 
-    // Send JSON RPC requests
-    const result = await provider.request(payload: RequestArguments);
+    let request = {
+      method: "my_test_method",
+      params: {
+        valA: 1,
+        valB: { ok: "yes" }
+      }
+    };
+    console.log("Sending custom request to wallet connect", request);
+    const result = await this.walletConnectProvider.request(request);
+    console.log("Got custom request response", result);
+  }
 
-    // Close provider session
-    await provider.disconnect()
-    */
-
-    /*
-
-    //  Get Accounts
-    const accounts = await web3.eth.getAccounts();
-
-    //  Get Chain Id
-    const chainId = await web3.eth.chainId();
-
-    //  Get Network Id
-    const networkId = await web3.eth.net.getId();
-
-    // Send Transaction
-    const txHash = await web3.eth.sendTransaction(tx);
-
-    // Sign Transaction
-    const signedTx = await web3.eth.signTransaction(tx);
-
-    // Sign Message
-    const signedMessage = await web3.eth.sign(msg);
-
-    // Sign Typed Data
-    const signedTypedData = await web3.eth.signTypedData(msg);
-    */
-
-    const accounts = await web3.eth.getAccounts();
+  public async testWalletConnectMint() {
+    const accounts = await this.walletConnectWeb3.eth.getAccounts();
 
     let contractAbi = require("../../assets/erc721.abi.json");
     let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
-    let contract = new web3.eth.Contract(contractAbi, contractAddress);
+    let contract = new this.walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
-    let gasPrice = await web3.eth.getGasPrice();
+    let gasPrice = await this.walletConnectWeb3.eth.getGasPrice();
     console.log("Gas price:", gasPrice);
 
     console.log("Sending transaction with account address:", accounts[0]);
@@ -213,8 +197,10 @@ export class HomePage {
   }
 
   public async testWalletConnectDisconnect() {
-    let provider = this.getWalletConnectProvider();
-    provider.disconnect();
+    if (this.walletConnectProvider) {
+      this.walletConnectProvider.disconnect();
+      this.walletConnectProvider = null;
+    }
   }
 
   /*public async testHiveAuth() {
