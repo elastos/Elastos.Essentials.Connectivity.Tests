@@ -11,8 +11,6 @@ if (environment.production) {
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.log(err));
 
-  let a: Intl.RelativeTimeFormatUnit = null;
-
   /*declare namespace Intl {
     type RelativeTimeFormatUnit = any;
     type RelativeTimeFormat = any;

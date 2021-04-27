@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
-import { EssentialsConnector, LinkType } from "@elastosfoundation/essentials-connector-client-browser";
+import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3, {  } from "web3";
 
@@ -15,12 +15,6 @@ export class HomePage {
   private walletConnectWeb3: Web3;
 
   constructor() {
-    this.essentialsConnector.setLinkType(LinkType.Connected);
-    this.essentialsConnector.setupServer({
-      host: 'localhost',
-      clientWsPort: 6020
-    });
-
     connectivity.registerConnector(this.essentialsConnector);
 
     // Needed for hive authentication (app id credential)
@@ -78,12 +72,11 @@ export class HomePage {
     }
   }
 
-
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
     let response = await wallet.pay({receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.01, memo: 'just test memo', currency: 'ELA/ETHSC'});
-    console.log("pay respone", response);
+    console.log("Pay response", response);
   }
 
   private async setupWalletConnectProvider() {
@@ -94,7 +87,7 @@ export class HomePage {
         21: "https://api-testnet.elastos.io/eth",
       },
       //bridge: "http://192.168.1.3/"
-      bridge: "http://192.168.31.114:5001"
+      //bridge: "http://192.168.31.114:5001"
     });
 
     console.log("Connected?", this.walletConnectProvider.connected);
@@ -122,7 +115,7 @@ export class HomePage {
     //  Enable session (triggers QR Code modal)
     console.log("Connecting to wallet connect");
     let enabled = await this.walletConnectProvider.enable();
-    console.log("CONNECTED to wallet connect", enabled);
+    console.log("CONNECTED to wallet connect", enabled, this.walletConnectProvider);
 
     this.walletConnectWeb3 = new Web3(this.walletConnectProvider as any); // HACK
   }
@@ -147,15 +140,19 @@ export class HomePage {
       params?: unknown[] | object;
     }
 
+    let connector = await this.walletConnectProvider.getWalletConnector();
+
+    console.log("connector", connector);
     let request = {
-      method: "my_test_method",
-      params: {
-        valA: 1,
-        valB: { ok: "yes" }
-      }
+      id: 1234567,
+      jsonrpc: "2.0",
+      method: "essentials_url_intent",
+      params: [{
+        url: "https://did.elastos.net/credaccess/?claims={\"email\":true}"
+      }]
     };
     console.log("Sending custom request to wallet connect", request);
-    const result = await this.walletConnectProvider.request(request);
+    const result = await connector.sendCustomRequest(request);
     console.log("Got custom request response", result);
   }
 

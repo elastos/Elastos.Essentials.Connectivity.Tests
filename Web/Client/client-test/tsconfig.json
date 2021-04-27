@@ -6,16 +6,16 @@
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
     "target": "es2015",
+    "lib": ["es2015", "dom"],
     "module": "es2020",
-    "lib": ["es2018", "dom"],
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "paths": {
       "crypto": ["./node_modules/crypto-browserify"],
       "stream": ["./node_modules/stream-browserify"]

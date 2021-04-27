@@ -3,6 +3,7 @@ import { Platform } from '@ionic/angular';
 import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 import { LocalIdentityConnector, localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
+import { Platform } from '@ionic/angular';
 
 declare let didManager: DIDPlugin.DIDManager;
 declare let intentManager: IntentPlugin.IntentManager;
@@ -17,8 +18,19 @@ export class HomePage {
   private localIdentityConnector = new LocalIdentityConnector();
   private essentialsConnector = new EssentialsConnector();
 
-  intit() {
+  constructor(private platform: Platform) {
+    this.platform.ready().then(async () => {
+      this.init();
+    });
+  }
+
+  private init() {
     console.log('init');
+
+    intentManager.addIntentListener((ret) => {
+      this.onIntentReceived(ret);
+    });
+    console.log('intentManager.addIntentListener');
 
     connectivity.registerConnector(this.localIdentityConnector);
     connectivity.registerConnector(this.essentialsConnector);
@@ -27,12 +39,6 @@ export class HomePage {
     // TODO - Now this is friend's dapp DID. Need to create a DID for this test app and configure it
     // with proper redirect url, etc.
     connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A");
-  }
-
-  constructor(private platform: Platform) {
-    this.platform.ready().then(async () => {
-      this.intit();
-    });
   }
 
   async onIntentReceived(intent: IntentPlugin.ReceivedIntent) {

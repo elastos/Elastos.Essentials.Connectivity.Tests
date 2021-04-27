@@ -35,7 +35,10 @@
               "src/theme/variables.scss",
               "src/global.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "hash.js"
+            ]
           },
           "configurations": {
             "production": {
