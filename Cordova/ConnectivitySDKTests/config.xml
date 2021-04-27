@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="net.elastos.essentials.cordova.test01" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Test01</name>
-    <description>An awesome Ionic/Cordova app.</description>
+<widget id="org.elastos.connectivitysdk.tests" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ConnectivitySDKTests</name>
+    <description>connectivity test app.</description>
     <author email="contact@trinity-tech.io" href="https://www.trinity-tech.io">
         Trinity Tech Co., Ltd.
     </author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://192.168.8.214:8101" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -23,14 +23,14 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="3000" />
-    <preference name="IntentRedirecturlFilter" value="https://test01.cordova.sdk.elastos.net" />
+    <preference name="IntentRedirecturlFilter" value="https://connectivity-sdk-tests.elastos.net" />
     <platform name="android">
         <config-file parent="/manifest/application/activity" target="AndroidManifest.xml">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="test01.cordova.sdk.elastos.net" android:pathPattern="/.*" android:scheme="https" />
+                <data android:host="connectivity-sdk-tests.elastos.net" android:pathPattern="/.*" android:scheme="https" />
             </intent-filter>
         </config-file>
         <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
@@ -60,6 +60,18 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <platform name="ios">
+        <preference name="SwiftVersion" value="5.2" />
+        <preference name="UseSwiftLanguageVersion" value="5.2" />
+        <config-file parent="com.apple.developer.associated-domains" target="*-Debug.plist">
+            <array>
+                <string>applinks:connectivity-sdk-tests.elastos.net</string>
+            </array>
+        </config-file>
+        <config-file parent="com.apple.developer.associated-domains" target="*-Release.plist">
+            <array>
+                <string>applinks:connectivity-sdk-tests.elastos.net</string>
+            </array>
+        </config-file>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
@@ -120,4 +132,5 @@
     <plugin name="cordova-plugin-ionic-webview" spec="^4.0.0" />
     <plugin name="cordova-plugin-ionic-keyboard" spec="^2.0.5" />
     <allow-navigation href="https://0.0.0.0:8100" sessionid="6852b290" />
+    <allow-navigation href="http://192.168.8.214:8101" sessionid="63b4b731" />
 </widget>
