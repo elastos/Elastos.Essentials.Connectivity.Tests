@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Platform } from '@ionic/angular';
 import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 import { LocalIdentityConnector, localIdentity } from "@elastosfoundation/elastos-connector-localidentity-cordova";
