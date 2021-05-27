@@ -35,7 +35,7 @@
     "@angular/compiler": "^11.2.0",
     "@angular/compiler-cli": "^11.2.0",
     "@angular/language-service": "^11.2.0",
-    "@elastosfoundation/elastos-cordova-plugin-did": "^1.0.3",
+    "@elastosfoundation/elastos-cordova-plugin-did": "^1.0.8",
     "@elastosfoundation/elastos-cordova-plugin-hive": "^1.0.3",
     "@elastosfoundation/elastos-cordova-plugin-intent": "^1.0.8",
     "@ionic/angular-toolkit": "^3.1.0",
