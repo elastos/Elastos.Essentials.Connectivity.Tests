@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { Component, NgZone } from '@angular/core';
+import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3, {  } from "web3";
@@ -13,8 +13,9 @@ export class HomePage {
   private essentialsConnector = new EssentialsConnector();
   private walletConnectProvider: WalletConnectProvider;
   private walletConnectWeb3: Web3;
+  public infoMessage: string = "";
 
-  constructor() {
+  constructor(private zone: NgZone) {
     connectivity.registerConnector(this.essentialsConnector);
 
     // Needed for hive authentication (app id credential)
@@ -24,6 +25,8 @@ export class HomePage {
   }
 
   public async testGetCredentials() {
+    this.infoMessage = "";
+
     let didAccess = new DID.DIDAccess();
     console.log("Trying to get credentials");
     let presentation = await didAccess.getCredentials({claims: {
@@ -59,13 +62,26 @@ export class HomePage {
         interests:{
           required: false,
           reason: "For test"
+        },
+        hecoWallet:{
+          required: false,
+          reason: "For creda test"
         }
       }}
     );
 
     if (presentation) {
       console.log("Got credentials:", presentation);
-      console.log(JSON.stringify(presentation));
+      //console.log(JSON.stringify(presentation));
+
+      let nameCredential = presentation.getCredentials().find((c) => {
+        return c.getId().getFragment() === "name";
+      });
+      if (nameCredential) {
+        this.zone.run(() => {
+          this.infoMessage = "Thank you for signing in, "+nameCredential.getSubject().getProperty("name");
+        });
+      }
     }
     else {
       console.warn("Empty presentation returned, something wrong happened, or operation was cancelled");
@@ -88,6 +104,7 @@ export class HomePage {
       },
       //bridge: "http://192.168.1.3/"
       //bridge: "http://192.168.31.114:5001"
+      bridge: "http://192.168.1.6:5001"
     });
 
     console.log("Connected?", this.walletConnectProvider.connected);
@@ -195,8 +212,14 @@ export class HomePage {
 
   public async testWalletConnectDisconnect() {
     if (this.walletConnectProvider) {
-      this.walletConnectProvider.disconnect();
+      console.log("Disconnecting from wallet connect");
+      //await this.walletConnectProvider.disconnect();
+      await (await this.walletConnectProvider.getWalletConnector()).killSession();
+      console.log("Disconnected from wallet connect");
       this.walletConnectProvider = null;
+    }
+    else {
+      console.log("Not connected to wallet connect");
     }
   }
 

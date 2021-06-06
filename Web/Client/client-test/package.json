@@ -19,7 +19,7 @@
     "@angular/platform-browser": "^11.2.0",
     "@angular/platform-browser-dynamic": "^11.2.0",
     "@angular/router": "^11.2.0",
-    "@elastosfoundation/elastos-connectivity-sdk-cordova": "^1.0.23",
+    "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.0",
     "@elastosfoundation/essentials-connector-client-browser": "file:../ess-connector-client-browser",
     "@ionic/angular": "^5.5.2",
     "@walletconnect/client": "^1.4.1",
