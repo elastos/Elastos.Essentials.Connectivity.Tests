@@ -1,8 +1,9 @@
 import { Component, NgZone } from '@angular/core';
-import { Hive , connectivity, DID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { Hive , connectivity, DID as ConnDID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3, {  } from "web3";
+import { DIDStore, Issuer, VerifiableCredential, DID, RootIdentity, Mnemonic, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 
 @Component({
   selector: 'app-home',
@@ -27,7 +28,7 @@ export class HomePage {
   public async testGetCredentials() {
     this.infoMessage = "";
 
-    let didAccess = new DID.DIDAccess();
+    let didAccess = new ConnDID.DIDAccess();
     console.log("Trying to get credentials");
     let presentation = await didAccess.getCredentials({claims: {
         name: true,
@@ -39,7 +40,7 @@ export class HomePage {
           required: false,
           reason: "For test"
         },
-        gender: {
+        /* gender: {
           required: false,
           reason: "For test"
         },
@@ -62,8 +63,12 @@ export class HomePage {
         interests:{
           required: false,
           reason: "For test"
-        },
+        }, */
         hecoWallet:{
+          required: false,
+          reason: "For creda test"
+        },
+        testcredential:{
           required: false,
           reason: "For creda test"
         }
@@ -88,6 +93,67 @@ export class HomePage {
     }
   }
 
+  public async testImportCredentials() {
+
+    /* var http = new XMLHttpRequest();
+    var url = 'https://api-testnet.elastos.io/newid';
+    var url = "http://52.80.107.251:1111";
+    //var url = "https://api.cyberrepublic.org/api/council/list/1";
+    var params = '';
+    //http.open('POST', url);
+    http.open('POST', url);
+
+    //Send the proper header information along with the request
+    http.setRequestHeader('Content-type', 'application/json');
+
+    http.onreadystatechange = function(a) {
+      console.log(a)
+        if(http.readyState == 4 && http.status == 200) {
+            console.log(http.responseText);
+        }
+    }
+    http.send(params); */
+
+
+
+    this.infoMessage = "";
+
+    console.log("Creating and importing a credential");
+    let storeId = "client-side-store";
+    let storePass = "unsafepass";
+    let passphrase = ""; // Mnemonic passphrase
+
+    // For this test, always re-create a new identity for the signer of the created credential.
+    // In real life, the signer should remain the same.
+    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.DEVNET));
+    let didStore = await DIDStore.open(storeId);
+    let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
+    console.log("Created identity:", rootIdentity);
+
+    let issuerDID = await rootIdentity.newDid(storePass, 0, true); // Index 0, overwrite
+    console.log("Issuer DID:", issuerDID);
+
+    let issuer = new Issuer(issuerDID);
+    console.log("Issuer:", issuer);
+
+    let targetDID = DID.from("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
+    console.log("Target DID:", targetDID);
+
+    // Create the credential
+    let vcb = new VerifiableCredential.Builder(issuer, targetDID);
+    let credential = await vcb.id("#testcredential").properties({
+      test: "Hello"
+    }).type("TestCredentialType").seal(storePass);
+    console.log("Generated credential:", credential);
+
+    // Send the credential to the identity wallet (essentials)
+    let didAccess = new ConnDID.DIDAccess();
+    let importedCredentials = await didAccess.importCredentials([credential]);
+
+    // Result of this import, depending on user
+    console.log("Imported credentials:", importedCredentials);
+  }
+
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
@@ -103,8 +169,8 @@ export class HomePage {
         21: "https://api-testnet.elastos.io/eth",
       },
       //bridge: "http://192.168.1.3/"
-      //bridge: "http://192.168.31.114:5001"
-      bridge: "http://192.168.1.6:5001"
+      bridge: "http://192.168.31.114:5001"
+      //bridge: "http://192.168.1.6:5001"
     });
 
     console.log("Connected?", this.walletConnectProvider.connected);
