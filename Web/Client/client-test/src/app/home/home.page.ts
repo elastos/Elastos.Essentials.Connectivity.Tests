@@ -94,28 +94,6 @@ export class HomePage {
   }
 
   public async testImportCredentials() {
-
-    /* var http = new XMLHttpRequest();
-    var url = 'https://api-testnet.elastos.io/newid';
-    var url = "http://52.80.107.251:1111";
-    //var url = "https://api.cyberrepublic.org/api/council/list/1";
-    var params = '';
-    //http.open('POST', url);
-    http.open('POST', url);
-
-    //Send the proper header information along with the request
-    http.setRequestHeader('Content-type', 'application/json');
-
-    http.onreadystatechange = function(a) {
-      console.log(a)
-        if(http.readyState == 4 && http.status == 200) {
-            console.log(http.responseText);
-        }
-    }
-    http.send(params); */
-
-
-
     this.infoMessage = "";
 
     console.log("Creating and importing a credential");
