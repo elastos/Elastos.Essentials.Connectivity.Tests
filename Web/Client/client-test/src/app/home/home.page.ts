@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { Hive , connectivity, DID as ConnDID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import Web3, {  } from "web3";
+import Web3 from "web3";
 import { DIDStore, Issuer, VerifiableCredential, DID, RootIdentity, Mnemonic, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 
 @Component({
@@ -32,6 +32,7 @@ export class HomePage {
     console.log("Trying to get credentials");
     let presentation = await didAccess.getCredentials({claims: {
         name: true,
+        creda: false,
         avatar: {
           required: false,
           reason: "For test"
@@ -40,30 +41,6 @@ export class HomePage {
           required: false,
           reason: "For test"
         },
-        /* gender: {
-          required: false,
-          reason: "For test"
-        },
-        telephone: {
-          required: false,
-          reason: "For test"
-        },
-        nation: {
-          required: false,
-          reason: "For test"
-        },
-        nickname:{
-          required: false,
-          reason: "For test"
-        },
-        description:{
-          required: false,
-          reason: "For test"
-        },
-        interests:{
-          required: false,
-          reason: "For test"
-        }, */
         hecoWallet:{
           required: false,
           reason: "For creda test"
@@ -119,8 +96,9 @@ export class HomePage {
 
     // Create the credential
     let vcb = new VerifiableCredential.Builder(issuer, targetDID);
-    let credential = await vcb.id("#testcredential").properties({
-      test: "Hello"
+    let credential = await vcb.id("#creda").properties({
+      wallet1: "xxxx",
+      wallet2: "xxxx"
     }).type("TestCredentialType").seal(storePass);
     console.log("Generated credential:", credential);
 
@@ -139,18 +117,21 @@ export class HomePage {
     console.log("Pay response", response);
   }
 
-  private async setupWalletConnectProvider() {
+  private createWalletConnectProvider(): WalletConnectProvider {
     //  Create WalletConnect Provider
     this.walletConnectProvider = new WalletConnectProvider({
       rpc: {
         20: "https://testnet.elastos.io/eth",
         21: "https://api-testnet.elastos.io/eth",
       },
-      //bridge: "http://192.168.1.3/"
-      bridge: "http://192.168.31.114:5001"
+      bridge: "https://walletconnect.elastos.net/v1"
+      //bridge: "http://192.168.31.114:5001"
       //bridge: "http://192.168.1.6:5001"
     });
+    return this.walletConnectProvider;
+  }
 
+  private async setupWalletConnectProvider() {
     console.log("Connected?", this.walletConnectProvider.connected);
 
     // Subscribe to accounts change
@@ -182,17 +163,28 @@ export class HomePage {
   }
 
   // https://docs.walletconnect.org/quick-start/dapps/web3-provider
-  public async testWalletConnectConnect() {
+  public async testWalletConnectConnectCustom() {
+    this.createWalletConnectProvider();
     await this.setupWalletConnectProvider();
+    this.essentialsConnector.setWalletConnectProvider(this.walletConnectProvider);
 
     //  Get Chain Id
-    const chainId = await this.walletConnectWeb3.eth.getChainId();
+    /* const chainId = await this.walletConnectWeb3.eth.getChainId();
     console.log("Chain ID: ", chainId);
 
     if (chainId != 20 && chainId != 21) {
       console.error("ERROR: Connected to wrong ethereum network "+chainId+". Not an elastos network. Check that the wallet app is using an Elastos network.");
       return;
+    } */
+  }
+
+  public async testWalletConnectConnectFromEssentialsConnector() {
+    this.walletConnectProvider = this.essentialsConnector.getWalletConnectProvider();
+    if (!this.walletConnectProvider) {
+      throw new Error("Essentials connector wallet connect provider is not initializez yet. Did you run some Elastos operations first?");
     }
+
+    await this.setupWalletConnectProvider();
   }
 
   public async testWalletConnectCustomRequest() {
