@@ -110,6 +110,13 @@ export class HomePage {
     console.log("Imported credentials:", importedCredentials);
   }
 
+  public async testSignDIDData() {
+    let didAccess = new ConnDID.DIDAccess();
+    console.log("Trying to sign data with user's DID");
+    let signedData = await didAccess.signData("data-to-sign", {extraField: 123}, "customSignatureField");
+    console.log("Signed data:", signedData);
+  }
+
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
