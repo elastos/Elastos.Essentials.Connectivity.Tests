@@ -175,6 +175,7 @@ export class HomePage {
 
   public deleteLocalStorage() {
     window.localStorage.clear();
+    window.location.href = "/";
   }
 
   public manageLocalIdentity() {
