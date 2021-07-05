@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { Hive , connectivity, DID as ConnDID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { Hive, connectivity, DID as ConnDID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
@@ -25,12 +25,13 @@ export class HomePage {
     connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A");
   }
 
-  public async testGetCredentials() {
+  public async testGetCredentials() {
     this.infoMessage = "";
 
     let didAccess = new ConnDID.DIDAccess();
     console.log("Trying to get credentials");
-    let presentation = await didAccess.getCredentials({claims: {
+    let presentation = await didAccess.getCredentials({
+      claims: {
         name: true,
         creda: false,
         avatar: {
@@ -41,15 +42,16 @@ export class HomePage {
           required: false,
           reason: "For test"
         },
-        hecoWallet:{
+        hecoWallet: {
           required: false,
           reason: "For creda test"
         },
-        testcredential:{
+        testcredential: {
           required: false,
           reason: "For creda test"
         }
-      }}
+      }
+    }
     );
 
     if (presentation) {
@@ -61,7 +63,7 @@ export class HomePage {
       });
       if (nameCredential) {
         this.zone.run(() => {
-          this.infoMessage = "Thank you for signing in, "+nameCredential.getSubject().getProperty("name");
+          this.infoMessage = "Thank you for signing in, " + nameCredential.getSubject().getProperty("name");
         });
       }
     }
@@ -71,6 +73,14 @@ export class HomePage {
   }
 
   public async testImportCredentials() {
+    this._testImportCredentials(false);
+  }
+
+  public async testImportCredentialsAndPublish() {
+    this._testImportCredentials(true);
+  }
+
+  private async _testImportCredentials(forcePublish: boolean) {
     this.infoMessage = "";
 
     console.log("Creating and importing a credential");
@@ -80,7 +90,7 @@ export class HomePage {
 
     // For this test, always re-create a new identity for the signer of the created credential.
     // In real life, the signer should remain the same.
-    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.DEVNET));
+    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.MAINNET));
     let didStore = await DIDStore.open(storeId);
     let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
     console.log("Created identity:", rootIdentity);
@@ -104,7 +114,11 @@ export class HomePage {
 
     // Send the credential to the identity wallet (essentials)
     let didAccess = new ConnDID.DIDAccess();
-    let importedCredentials = await didAccess.importCredentials([credential]);
+    let options: ConnDID.ImportCredentialOptions = {};
+    if (forcePublish)
+      options.forceToPublishCredentials = true;
+
+    let importedCredentials = await didAccess.importCredentials([credential], options);
 
     // Result of this import, depending on user
     console.log("Imported credentials:", importedCredentials);
@@ -113,14 +127,14 @@ export class HomePage {
   public async testSignDIDData() {
     let didAccess = new ConnDID.DIDAccess();
     console.log("Trying to sign data with user's DID");
-    let signedData = await didAccess.signData("data-to-sign", {extraField: 123}, "customSignatureField");
+    let signedData = await didAccess.signData("data-to-sign", { extraField: 123 }, "customSignatureField");
     console.log("Signed data:", signedData);
   }
 
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
-    let response = await wallet.pay({receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.01, memo: 'just test memo', currency: 'ELA/ETHSC'});
+    let response = await wallet.pay({ receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.01, memo: 'just test memo', currency: 'ELA/ETHSC' });
     console.log("Pay response", response);
   }
 
@@ -216,7 +230,7 @@ export class HomePage {
     console.log("Got custom request response", result);
   }
 
-  public async testWalletConnectMint() {
+  public async testETHCall() {
     const accounts = await this.walletConnectWeb3.eth.getAccounts();
 
     let contractAbi = require("../../assets/erc721.abi.json");
@@ -228,29 +242,72 @@ export class HomePage {
 
     console.log("Sending transaction with account address:", accounts[0]);
     let transactionParams = {
-        from: accounts[0],
-        gasPrice: gasPrice,
-        gas: 5000000,
-        value: 0
+      from: accounts[0],
+      gasPrice: gasPrice,
+      gas: 5000000,
+      value: 0
     };
 
     let address = accounts[0];
-    let tokenId = Math.floor(Math.random()*10000000000);
+    let tokenId = Math.floor(Math.random() * 10000000000);
     let tokenUri = "https://my.token.uri.com";
     console.log("Calling smart contract through wallet connect", address, tokenId, tokenUri);
     contract.methods.mint(address, tokenId, tokenUri).send(transactionParams)
-        .on('transactionHash', (hash) => {
-          console.log("transactionHash", hash);
-        })
-        .on('receipt', (receipt) => {
-          console.log("receipt", receipt);
-        })
-        .on('confirmation', (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
-        })
-        .on('error', (error, receipt) => {
-          console.error("error", error);
-        });
+      .on('transactionHash', (hash) => {
+        console.log("transactionHash", hash);
+      })
+      .on('receipt', (receipt) => {
+        console.log("receipt", receipt);
+      })
+      .on('confirmation', (confirmationNumber, receipt) => {
+        console.log("confirmation", confirmationNumber, receipt);
+      })
+      .on('error', (error, receipt) => {
+        console.error("error", error);
+      });
+  }
+
+  public async testAddERC20() {
+    /* const tokenAddress = '0x71E1EF01428138e516a70bA227659936B40f0138';
+    const tokenSymbol = 'CreDa';
+    const tokenDecimals = 18;
+    const tokenImage = 'http://placekitten.com/200/300'; */
+
+    const tokenAddress = '0x2fceb9e10c165ef72d5771a722e8ab5e6bc85015';
+    const tokenSymbol = 'BNA';
+    const tokenDecimals = 18;
+    const tokenImage = 'http://placekitten.com/200/300';
+
+    try {
+      // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+      let ethereum = this.walletConnectProvider; // window["ethereum"];
+
+      this.walletConnectWeb3 = new Web3(ethereum as any);
+      const accounts = await this.walletConnectWeb3.eth.getAccounts();
+      console.log("Accounts", accounts);
+
+      const wasAdded = await ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20', // Initially only supports ERC20, but eventually more!
+          options: {
+            address: tokenAddress, // The address that the token is at.
+            symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 chars.
+            decimals: tokenDecimals, // The number of decimals in the token
+            image: tokenImage, // A string url of the token logo
+          },
+        },
+      });
+
+      if (wasAdded) {
+        console.log('Token address added to wallet');
+      }
+      else {
+        console.warn('Token address NOT added to wallet!');
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   public async testWalletConnectDisconnect() {

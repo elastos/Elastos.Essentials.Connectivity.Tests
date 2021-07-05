@@ -1,0 +1,4 @@
+- Feeds ERC1155 deployed on Elastos SC mainnet:
+  - 0x748E0f6280B324695d68d3EC14BB5225888d981F
+  - owner: 0xbA1ddcB94B3F8FE5d1C0b2623cF221e099f485d1 (ben)
+  - call initialize() once after deployment, before mint()

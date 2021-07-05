@@ -10,7 +10,9 @@
     <h3>Identity</h3>
     <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
     <br/>
-    <ion-button (click)="testImportCredentials()">Create and import Credentials</ion-button>
+    <ion-button (click)="testImportCredentials()">Create and import Credentials (default)</ion-button>
+    <br/>
+    <ion-button (click)="testImportCredentialsAndPublish()">Create and import Credentials (publish)</ion-button>
     <br/>
     <ion-button (click)="testSignDIDData()">Sign data</ion-button>
     <br/>
@@ -18,6 +20,8 @@
     <ion-button (click)="testPay()">Test Pay</ion-button>
     <br/>
     <ion-button (click)="testETHCall()">Test ETH call</ion-button>
+    <br/>
+    <ion-button (click)="testAddERC20()">Add ERC20 token</ion-button>
     <br/>
     <h3>Storage</h3>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>
@@ -28,8 +32,6 @@
     <ion-button (click)="testWalletConnectConnectCustom()">Wallet connect: connect app custom</ion-button>
     <ion-button (click)="testWalletConnectConnectFromEssentialsConnector()">Wallet connect: use essentials'</ion-button>
     <ion-button (click)="testWalletConnectDisconnect()">Wallet connect: disconnect</ion-button>
-    <br/>
-    <ion-button (click)="testWalletConnectMint()">Wallet connect: mint</ion-button>
     <br/>
     <ion-button (click)="testWalletConnectCustomRequest()">Wallet connect: custom request</ion-button>
     <br/>
