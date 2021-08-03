@@ -131,6 +131,34 @@ export class HomePage {
     console.log("Signed data:", signedData);
   }
 
+  public async testDIDTransaction() {
+    let connector = await this.walletConnectProvider.getWalletConnector();
+
+    let didRequest = {
+      "header" : {
+        "specification" : "elastos/did/1.0",
+        "operation" : "create"
+      },
+      "payload" : "eyJpZCI6ImRpZDplbGFzdG9zOmlrYndoWmVvUlhwdDFpQ2hTamNrVUdwc3RKWHhWc1lnTXMiLCJwdWJsaWNLZXkiOlt7ImlkIjoiZGlkOmVsYXN0b3M6aWtid2haZW9SWHB0MWlDaFNqY2tVR3BzdEpYeFZzWWdNcyNwcmltYXJ5IiwidHlwZSI6IkVDRFNBc2VjcDI1NnIxIiwiY29udHJvbGxlciI6ImRpZDplbGFzdG9zOmlrYndoWmVvUlhwdDFpQ2hTamNrVUdwc3RKWHhWc1lnTXMiLCJwdWJsaWNLZXlCYXNlNTgiOiJ0OUdHMndnUkViaTRSRkV6MVpERHVGS3l1WGVNMWFnM1Fkbmh5djhUUWE5RCJ9XSwiYXV0aGVudGljYXRpb24iOlsiZGlkOmVsYXN0b3M6aWtid2haZW9SWHB0MWlDaFNqY2tVR3BzdEpYeFZzWWdNcyNwcmltYXJ5Il0sImV4cGlyZXMiOiIyMDI2LTA4LTAxVDA4OjUzOjAwWiIsInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTAxVDA4OjUzOjAwWiIsImNyZWF0b3IiOiJkaWQ6ZWxhc3Rvczppa2J3aFplb1JYcHQxaUNoU2pja1VHcHN0Slh4VnNZZ01zI3ByaW1hcnkiLCJzaWduYXR1cmVWYWx1ZSI6InV1VGdTemlZN2NpaDMzVWhJZXlqOUJxdFJLeEJYRmJoem5GYkJMa19MMW1oeUFhb0lOeFcxZzVGODMzUU5RTzA4SkJwVUc2d0tCWU9uTHlqdEd5aEh3In19",
+      "proof" : {
+        "type" : "ECDSAsecp256r1",
+        "verificationMethod" : "did:elastos:ikbwhZeoRXpt1iChSjckUGpstJXxVsYgMs#primary",
+        "signature" : "pkeak1CCG7hoOhaiRJB2JIn7rQp4QcXz8VDKgmnT32WpQBYKUszXDmIt9ct-Ag-XSAmdiH8Q_crhNolb_WWqbg"
+      }
+    };
+    let request = {
+      id: 1234567,
+      jsonrpc: "2.0",
+      method: "essentials_url_intent",
+      params: [{
+        url: "https://did.elastos.net/didtransaction/?didrequest="+encodeURIComponent(JSON.stringify(didRequest))
+      }]
+    };
+    console.log("Sending DID didtransaction as custom request to wallet connect", request);
+    const result = await connector.sendCustomRequest(request);
+    console.log("Got DID didtransaction custom request response", result);
+  }
+
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
@@ -209,11 +237,6 @@ export class HomePage {
   }
 
   public async testWalletConnectCustomRequest() {
-    interface RequestArguments {
-      method: string;
-      params?: unknown[] | object;
-    }
-
     let connector = await this.walletConnectProvider.getWalletConnector();
 
     console.log("connector", connector);
