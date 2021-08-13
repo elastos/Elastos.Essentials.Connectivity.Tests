@@ -162,7 +162,7 @@ export class HomePage {
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
-    let response = await wallet.pay({ receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.01, memo: 'just test memo', currency: 'ELA/ETHSC' });
+    let response = await wallet.pay({ receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.0001, memo: 'just test memo', currency: 'ELA/ETHSC' });
     console.log("Pay response", response);
   }
 
@@ -173,7 +173,9 @@ export class HomePage {
         20: "https://api.elastos.io/eth",
         21: "https://api-testnet.elastos.io/eth",
       },
-      bridge: "https://walletconnect.elastos.net/v1"
+      //bridge: "https://walletconnect.elastos.net/v1", // Tokyo, server with the website
+      bridge: "https://walletconnect.trinity-tech.cn/", // China
+      //bridge: "https://walletconnect.trinity-feeds.app/" // Tokyo, standalone server
       //bridge: "http://192.168.31.114:5001"
       //bridge: "http://192.168.1.6:5001"
     });
@@ -275,6 +277,45 @@ export class HomePage {
     let tokenId = Math.floor(Math.random() * 10000000000);
     let tokenUri = "https://my.token.uri.com";
     console.log("Calling smart contract through wallet connect", address, tokenId, tokenUri);
+    contract.methods.mint(address, tokenId, tokenUri).send(transactionParams)
+      .on('transactionHash', (hash) => {
+        console.log("transactionHash", hash);
+      })
+      .on('receipt', (receipt) => {
+        console.log("receipt", receipt);
+      })
+      .on('confirmation', (confirmationNumber, receipt) => {
+        console.log("confirmation", confirmationNumber, receipt);
+      })
+      .on('error', (error, receipt) => {
+        console.error("error", error);
+      });
+  }
+
+  public async testInjectedETHCall() {
+    let ethereum =  (window as any).ethereum;
+    let web3 = new Web3(ethereum);
+    const accounts = await ethereum.request({ method: 'eth_accounts' });
+
+    let contractAbi = require("../../assets/erc721.abi.json");
+    let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
+    let contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+    let gasPrice = await web3.eth.getGasPrice();
+    console.log("Gas price:", gasPrice);
+
+    console.log("Sending transaction with account address:", accounts[0]);
+    let transactionParams = {
+      from: accounts[0],
+      gasPrice: gasPrice,
+      gas: 5000000,
+      value: 0
+    };
+
+    let address = accounts[0];
+    let tokenId = Math.floor(Math.random() * 10000000000);
+    let tokenUri = "https://my.token.uri.com";
+    console.log("Calling MINT smart contract through wallet connect", address, tokenId, tokenUri);
     contract.methods.mint(address, tokenId, tokenUri).send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log("transactionHash", hash);
