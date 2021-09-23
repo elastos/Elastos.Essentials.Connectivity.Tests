@@ -1,9 +1,9 @@
 import { Component, NgZone } from '@angular/core';
-import { Hive, connectivity, DID as ConnDID, Wallet, localization, theme } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { DID, DIDBackend, DIDStore, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
+import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
-import { DIDStore, Issuer, VerifiableCredential, DID, RootIdentity, Mnemonic, DIDBackend, DefaultDIDAdapter } from "@elastosfoundation/did-js-sdk";
 
 @Component({
   selector: 'app-home',
@@ -124,6 +124,37 @@ export class HomePage {
     console.log("Imported credentials:", importedCredentials);
   }
 
+  public async testDeleteCredential() {
+    this.infoMessage = "";
+
+    let didAccess = new ConnDID.DIDAccess();
+    let credentialId = "#email";
+    console.log("Trying to delete credentials");
+    let deletedCredentials = await didAccess.deleteCredentials(credentialId);
+    console.log("Deleted credentials:", deletedCredentials);
+  }
+
+  public async testDeleteCredentialAndPublish() {
+    this.infoMessage = "";
+
+    let didAccess = new ConnDID.DIDAccess();
+    let credentialId = "#email";
+    console.log("Trying to delete credentials (publish)");
+    let deletedCredentials = await didAccess.deleteCredentials(credentialId, {
+      forceToPublishCredentials: true
+    });
+    console.log("Deleted credentials:", deletedCredentials);
+  }
+
+  public async testRequestPublish() {
+    this.infoMessage = "";
+
+    let didAccess = new ConnDID.DIDAccess();
+    console.log("Requesting DID publishing");
+    let txId = await didAccess.requestPublish();
+    console.log("Published DID txid:", txId);
+  }
+
   public async testSignDIDData() {
     let didAccess = new ConnDID.DIDAccess();
     console.log("Trying to sign data with user's DID");
@@ -131,19 +162,27 @@ export class HomePage {
     console.log("Signed data:", signedData);
   }
 
+  public async testGetAppIDCredential() {
+    let didAccess = new ConnDID.DIDAccess();
+    console.log("Trying to get an app id credential");
+    let credential = await didAccess.generateAppIdCredential();
+    console.log("App id credential:", credential);
+  }
+
   public async testDIDTransaction() {
     let connector = await this.walletConnectProvider.getWalletConnector();
 
     let didRequest = {
-      "header" : {
-        "specification" : "elastos/did/1.0",
-        "operation" : "create"
+      "header": {
+        "specification": "elastos/did/1.0",
+        "operation": "update",
+        "previousTxid": "8430c4f93f3662c071e796d93cca6b1d7ead8b6d4a8d008bb690f358446fc400"
       },
-      "payload" : "eyJpZCI6ImRpZDplbGFzdG9zOmlrYndoWmVvUlhwdDFpQ2hTamNrVUdwc3RKWHhWc1lnTXMiLCJwdWJsaWNLZXkiOlt7ImlkIjoiZGlkOmVsYXN0b3M6aWtid2haZW9SWHB0MWlDaFNqY2tVR3BzdEpYeFZzWWdNcyNwcmltYXJ5IiwidHlwZSI6IkVDRFNBc2VjcDI1NnIxIiwiY29udHJvbGxlciI6ImRpZDplbGFzdG9zOmlrYndoWmVvUlhwdDFpQ2hTamNrVUdwc3RKWHhWc1lnTXMiLCJwdWJsaWNLZXlCYXNlNTgiOiJ0OUdHMndnUkViaTRSRkV6MVpERHVGS3l1WGVNMWFnM1Fkbmh5djhUUWE5RCJ9XSwiYXV0aGVudGljYXRpb24iOlsiZGlkOmVsYXN0b3M6aWtid2haZW9SWHB0MWlDaFNqY2tVR3BzdEpYeFZzWWdNcyNwcmltYXJ5Il0sImV4cGlyZXMiOiIyMDI2LTA4LTAxVDA4OjUzOjAwWiIsInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTAxVDA4OjUzOjAwWiIsImNyZWF0b3IiOiJkaWQ6ZWxhc3Rvczppa2J3aFplb1JYcHQxaUNoU2pja1VHcHN0Slh4VnNZZ01zI3ByaW1hcnkiLCJzaWduYXR1cmVWYWx1ZSI6InV1VGdTemlZN2NpaDMzVWhJZXlqOUJxdFJLeEJYRmJoem5GYkJMa19MMW1oeUFhb0lOeFcxZzVGODMzUU5RTzA4SkJwVUc2d0tCWU9uTHlqdEd5aEh3In19",
-      "proof" : {
-        "type" : "ECDSAsecp256r1",
-        "verificationMethod" : "did:elastos:ikbwhZeoRXpt1iChSjckUGpstJXxVsYgMs#primary",
-        "signature" : "pkeak1CCG7hoOhaiRJB2JIn7rQp4QcXz8VDKgmnT32WpQBYKUszXDmIt9ct-Ag-XSAmdiH8Q_crhNolb_WWqbg"
+      "payload": "eyJpZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJwdWJsaWNLZXkiOlt7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSNwcmltYXJ5IiwidHlwZSI6IkVDRFNBc2VjcDI1NnIxIiwiY29udHJvbGxlciI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJwdWJsaWNLZXlCYXNlNTgiOiJyeW44NFcyVlNQNHBuNFdUb2VyQmNCdlZQTDJra1J1Ym5tZWo2RUZnellVOSJ9XSwiYXV0aGVudGljYXRpb24iOlsiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSNwcmltYXJ5Il0sInZlcmlmaWFibGVDcmVkZW50aWFsIjpbeyJpZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjYXZhdGFyIiwidHlwZSI6WyJCYXNpY1Byb2ZpbGVDcmVkZW50aWFsIiwiU2VsZlByb2NsYWltZWRDcmVkZW50aWFsIl0sImlzc3VlciI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJpc3N1YW5jZURhdGUiOiIyMDIxLTA3LTI5VDA3OjU1OjIyWiIsImV4cGlyYXRpb25EYXRlIjoiMjAyNi0wNy0yOFQwNzo1NToyMloiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJhdmF0YXIiOnsiY29udGVudC10eXBlIjoiaW1hZ2UvcG5nIiwiZGF0YSI6ImhpdmU6Ly9kaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxQGRpZDplbGFzdG9zOmlnMW5xeXlKaHdUY3RkTHlERmJab21TYlpTanlNTjF1b3IvZ2V0TWFpbklkZW50aXR5QXZhdGFyMTYyNzU0NTMxNDEzNz9wYXJhbXM9e1wiZW1wdHlcIjowfSIsInR5cGUiOiJlbGFzdG9zaGl2ZSJ9fSwicHJvb2YiOnsidHlwZSI6IkVDRFNBc2VjcDI1NnIxIiwiY3JlYXRlZCI6IjIwMjEtMDctMjlUMDc6NTU6MjJaIiwidmVyaWZpY2F0aW9uTWV0aG9kIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSNwcmltYXJ5Iiwic2lnbmF0dXJlIjoiSmg1azVEV1lMSzFhZWtWem5WQ1RaQUhTejNLSFhrM1JBQ0lvb2Q3cjFVYjN5eHR0aDJDNkVzMlRWSzhzLUhsdk1ncnJTZmpDMGhmbHRFS0V3bTAtS3cifX0seyJpZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjZGVzY3JpcHRpb24iLCJ0eXBlIjpbIkJhc2ljUHJvZmlsZUNyZWRlbnRpYWwiLCJTZWxmUHJvY2xhaW1lZENyZWRlbnRpYWwiXSwiaXNzdWVyIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsImlzc3VhbmNlRGF0ZSI6IjIwMjEtMDYtMjRUMTQ6NTk6NDlaIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI2LTA2LTIzVDE0OjU5OjQ5WiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsImRlc2NyaXB0aW9uIjoiRWxhc3RvcyBFc3NlbnRpYWxzIHRlYW0gbGVhZGVyIn0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA2LTI0VDE0OjU5OjQ5WiIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjcHJpbWFyeSIsInNpZ25hdHVyZSI6ImllUzN4ZUkxTURmVmI3TVFSMWI3MFRFVnl3VlpaY2lKNHJhcEE2SUxnMllVTy00WnBRTDJ2Q2x3emlqcUF4VWVGOFVvZHBwdHVuYlh3MTI0YlN0QVN3In19LHsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI2VsYUFkZHJlc3MiLCJ0eXBlIjpbIkJhc2ljUHJvZmlsZUNyZWRlbnRpYWwiLCJTZWxmUHJvY2xhaW1lZENyZWRlbnRpYWwiXSwiaXNzdWVyIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsImlzc3VhbmNlRGF0ZSI6IjIwMjEtMDgtMDZUMDU6Mzk6NTNaIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI2LTA4LTA1VDA1OjM5OjUzWiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsImVsYUFkZHJlc3MiOiJFSzZSdEZVMU1EWWpDa3hZYjhlSGRRU3VqaWtQUGNNUGI1In0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTA2VDA1OjM5OjUzWiIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjcHJpbWFyeSIsInNpZ25hdHVyZSI6IjhZSDI2X253QlNXbGdIRS1jT0ZxWUdPVTVydmZMOW8wYkhjMExVQllUNTdXNHFpeHVGOGQ5c3FmWlRzOWt4V3czc1UwclVDSzBCdWhXVW95bTBEWGNnIn19LHsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI2dlbmRlciIsInR5cGUiOlsiQmFzaWNQcm9maWxlQ3JlZGVudGlhbCIsIlNlbGZQcm9jbGFpbWVkQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxIiwiaXNzdWFuY2VEYXRlIjoiMjAyMS0wOC0xOVQwNjo0MzoyOVoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjYtMDgtMThUMDY6NDM6MjlaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxIiwiZ2VuZGVyIjoibWFsZSJ9LCJwcm9vZiI6eyJ0eXBlIjoiRUNEU0FzZWNwMjU2cjEiLCJjcmVhdGVkIjoiMjAyMS0wOC0xOVQwNjo0MzoyOVoiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI3ByaW1hcnkiLCJzaWduYXR1cmUiOiJUNEJHWFQtY3E0Z1c2UloweVlKUWlLTUtBWFRHN1pTM1lRakxJdzBWSjVfVXVXVk9DbnBsZGpRLXE3aFFrREM4WmR6VUVhU3BiZXN6aTBIQU05bjUyUSJ9fSx7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSNuYW1lIiwidHlwZSI6WyJCYXNpY1Byb2ZpbGVDcmVkZW50aWFsIiwiU2VsZlByb2NsYWltZWRDcmVkZW50aWFsIl0sImlzc3VlciI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJpc3N1YW5jZURhdGUiOiIyMDIxLTA4LTE5VDA2OjU5OjI4WiIsImV4cGlyYXRpb25EYXRlIjoiMjAyNi0wOC0xOFQwNjo1OToyOFoiLCJjcmVkZW50aWFsU3ViamVjdCI6eyJpZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEiLCJuYW1lIjoiQmVuamFtaW4gUGlldHRlIn0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTE5VDA2OjU5OjI4WiIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjcHJpbWFyeSIsInNpZ25hdHVyZSI6IlVtSThxREs4M3dwWEFYRGgwTzVfc3dvVUk2Q1pvTnJFZENLdFcxUmJIT2RnRy1lQWd2YU5OamJDNlVZeGNQbUlUOVFuWWZsNko1eXlzTzA5dHk1cnlRIn19LHsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI25hdGlvbiIsInR5cGUiOlsiQmFzaWNQcm9maWxlQ3JlZGVudGlhbCIsIlNlbGZQcm9jbGFpbWVkQ3JlZGVudGlhbCJdLCJpc3N1ZXIiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxIiwiaXNzdWFuY2VEYXRlIjoiMjAyMS0wOC0xOVQwNjo1OToyOFoiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjYtMDgtMThUMDY6NTk6MjhaIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxIiwibmF0aW9uIjoiRlJBIn0sInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTE5VDA2OjU5OjI4WiIsInZlcmlmaWNhdGlvbk1ldGhvZCI6ImRpZDplbGFzdG9zOmluc1RteGRERHVTOXdISGZlWUQxaDVDMm9uRUhoM0Q4VnEjcHJpbWFyeSIsInNpZ25hdHVyZSI6IlI5cno2QWZILWd5S1VDTHVYREJTM0NwVHJVOUNuaFptN0VpRWRubzBycTJQTWxxY2xkQkxkMVJ6VVRqRi0xOFlJbldzN3EzQ2RhaGR4bEdIRzl5Rk9RIn19LHsiaWQiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI3R3aXR0ZXIiLCJ0eXBlIjpbIkJhc2ljUHJvZmlsZUNyZWRlbnRpYWwiLCJTZWxmUHJvY2xhaW1lZENyZWRlbnRpYWwiXSwiaXNzdWVyIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsImlzc3VhbmNlRGF0ZSI6IjIwMjEtMDgtMTlUMDY6NTk6MjhaIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDI2LTA4LTE4VDA2OjU5OjI4WiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSIsInR3aXR0ZXIiOiJAUHJvY3RhciJ9LCJwcm9vZiI6eyJ0eXBlIjoiRUNEU0FzZWNwMjU2cjEiLCJjcmVhdGVkIjoiMjAyMS0wOC0xOVQwNjo1OToyOFoiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI3ByaW1hcnkiLCJzaWduYXR1cmUiOiJIRGhHemJOeG5hYkk2UUdQTUlTVG5pWW1lN0pmLVB3RGJUMEhQUGxEMW5FOG9VZmttcTRfbENfQ2FnMHRHWlM5YXRPbFVVOWFtVVBhYmdrR0djTl9ZUSJ9fV0sInNlcnZpY2UiOlt7ImlkIjoiZGlkOmVsYXN0b3M6aW5zVG14ZEREdVM5d0hIZmVZRDFoNUMyb25FSGgzRDhWcSNoaXZldmF1bHQiLCJ0eXBlIjoiSGl2ZVZhdWx0Iiwic2VydmljZUVuZHBvaW50IjoiaHR0cHM6Ly9oaXZlMi50cmluaXR5LXRlY2guaW8ifV0sImV4cGlyZXMiOiIyMDI1LTAxLTA5VDA2OjM3OjUzWiIsInByb29mIjp7InR5cGUiOiJFQ0RTQXNlY3AyNTZyMSIsImNyZWF0ZWQiOiIyMDIxLTA4LTE5VDA4OjI5OjU5WiIsImNyZWF0b3IiOiJkaWQ6ZWxhc3RvczppbnNUbXhkRER1Uzl3SEhmZVlEMWg1QzJvbkVIaDNEOFZxI3ByaW1hcnkiLCJzaWduYXR1cmVWYWx1ZSI6Im8wOHliNk1fTDJmZEVfZmJsUG1LWFE1TG1RVTJhUmdBMUsycEttMWZZV0E3a3FHSEJLQU9qZHNHakJpX0dwSkZqa2VyNGlLQTFLb3dVTTdOSU5uV0pBIn19",
+      "proof": {
+        "type": "ECDSAsecp256r1",
+        "verificationMethod": "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq#primary",
+        "signature": "tVQgJ-PpzwB-2_zvI6OLdh7CmvHztkjRclOvDwh4W5GwfNhdEFRH4uhwzLo90pHzC1Bie7hRGnU4Dh3XBwpyOQ"
       }
     };
     let request = {
@@ -151,7 +190,7 @@ export class HomePage {
       jsonrpc: "2.0",
       method: "essentials_url_intent",
       params: [{
-        url: "https://did.elastos.net/didtransaction/?didrequest="+encodeURIComponent(JSON.stringify(didRequest))
+        url: "https://did.elastos.net/didtransaction/?didrequest=" + encodeURIComponent(JSON.stringify(didRequest))
       }]
     };
     console.log("Sending DID didtransaction as custom request to wallet connect", request);
@@ -172,9 +211,12 @@ export class HomePage {
       rpc: {
         20: "https://api.elastos.io/eth",
         21: "https://api-testnet.elastos.io/eth",
+        128: "https://http-mainnet.hecochain.com" // Heco mainnet
       },
       //bridge: "https://walletconnect.elastos.net/v1", // Tokyo, server with the website
-      bridge: "https://walletconnect.trinity-tech.cn/", // China
+      //bridge: "https://walletconnect.elastos.net/v2", // Tokyo, server with the website, v2.0 "relay" server
+      //bridge: "https://wallet-connect.trinity-tech.cn/", // China
+      bridge: "https://wallet-connect.trinity-tech.cn/v2", // China
       //bridge: "https://walletconnect.trinity-feeds.app/" // Tokyo, standalone server
       //bridge: "http://192.168.31.114:5001"
       //bridge: "http://192.168.1.6:5001"
@@ -293,7 +335,7 @@ export class HomePage {
   }
 
   public async testInjectedETHCall() {
-    let ethereum =  (window as any).ethereum;
+    let ethereum = (window as any).ethereum;
     let web3 = new Web3(ethereum);
     const accounts = await ethereum.request({ method: 'eth_accounts' });
 
@@ -456,3 +498,31 @@ export class HomePage {
     this.essentialsConnector.unlinkEssentialsDevice();
   }
 }
+
+/*
+function notCalledTest() {
+  // OLD - finds a credential by ID
+  appManager.sendIntent("credaccess", {
+    claims: {
+      email: true,
+      name: {
+        required: false,
+        reason: "xxx"
+      }
+    }
+  }); // --> Returns a VP
+
+  // NEW - finds a credential by CREDENTIAL TYPE
+  appManager.sendIntent("credaccess", {
+    claims: {
+      // New standard format:
+      "did:elastos:trinitytech#EssentialsTelegramMembership": true,
+      "schema.org/givenName": {
+        required: false, // Optional credential
+        reason: "To know your name"
+      }
+      // Backward compatibility / convenience:
+      "email": true // Essentials will map to "schema.org/email" internally. Just for convenience to not break the few dapps we currently have
+    }
+  }); // --> Returns a VP
+} */

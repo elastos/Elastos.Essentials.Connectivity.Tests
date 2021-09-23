@@ -1,46 +1,54 @@
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Web client test</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <div id="container">
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br />
     <h2>{{infoMessage}}</h2>
     <h3>Identity</h3>
     <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testImportCredentials()">Create and import Credentials (default)</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testImportCredentialsAndPublish()">Create and import Credentials (publish)</ion-button>
-    <br/>
+    <br />
+    <ion-button (click)="testDeleteCredential()">Delete credential (default)</ion-button>
+    <br />
+    <ion-button (click)="testDeleteCredentialAndPublish()">Delete credential (publish)</ion-button>
+    <br />
+    <ion-button (click)="testRequestPublish()">Request Publish</ion-button>
+    <br />
     <ion-button (click)="testSignDIDData()">Sign data</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testDIDTransaction()">Publish DID Transaction</ion-button>
-    <br/>
+    <br />
+    <ion-button (click)="testGetAppIDCredential()">Get app ID credential</ion-button>
+    <br />
     <h3>Payments</h3>
     <ion-button (click)="testPay()">Test Pay</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testETHCall()">Test ETH call</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testInjectedETHCall()">Test injected ETH call</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testAddERC20()">Add ERC20 token</ion-button>
-    <br/>
+    <br />
     <h3>Storage</h3>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>
-    <br/>
-    <br/>
-    <br/>
+    <br />
+    <br />
+    <br />
     <h3>Utilities</h3>
     <ion-button (click)="testWalletConnectConnectCustom()">Wallet connect: connect app custom</ion-button>
     <ion-button (click)="testWalletConnectConnectFromEssentialsConnector()">Wallet connect: use essentials'</ion-button>
     <ion-button (click)="testWalletConnectDisconnect()">Wallet connect: disconnect</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testWalletConnectCustomRequest()">Wallet connect: custom request</ion-button>
-    <br/>
-    <br/>
+    <br />
+    <br />
+    <h3>Other tests</h3>
+    <a href="https://wallet.elastos.net/pay?amount=12" target="_blank">Pay link</a>
+    <br />
+    <br />
+    <br />
+    <br />
     <!--<ion-button (click)="testHiveAuth()">Hive Auth</ion-button>
     <br/>
     <ion-button (click)="unselectActiveConnector()">Forget current connector</ion-button>
@@ -64,5 +72,6 @@
     <ion-button (click)="registerLocalConnector()">Connector: register Local identity</ion-button>
     <ion-button (click)="unregisterLocalConnector()">Connector: unregister Local identity</ion-button>-->
     <ion-button (click)="testUnlinkEssentialsConnection()">Unlink connection to Essentials </ion-button>
+    <br /><br />
   </div>
 </ion-content>
