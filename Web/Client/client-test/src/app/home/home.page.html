@@ -5,6 +5,8 @@
     <h3>Identity</h3>
     <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
     <br />
+    <ion-button (click)="testIssueCredentials()">Issue a credential for others</ion-button>
+    <br />
     <ion-button (click)="testImportCredentials()">Create and import Credentials (default)</ion-button>
     <br />
     <ion-button (click)="testImportCredentialsAndPublish()">Create and import Credentials (publish)</ion-button>
@@ -26,9 +28,17 @@
     <br />
     <ion-button (click)="testETHCall()">Test ETH call</ion-button>
     <br />
+    <ion-button (click)="testSignTypedData()">Test ETH sign typed data</ion-button>
+    <br />
     <ion-button (click)="testInjectedETHCall()">Test injected ETH call</ion-button>
     <br />
     <ion-button (click)="testAddERC20()">Add ERC20 token</ion-button>
+    <br />
+    <ion-button (click)="testSwitchToElastos()">Switch to Elastos</ion-button>
+    <ion-button (click)="testSwitchToHeco()">Switch to Heco</ion-button>
+    <br />
+    <ion-button (click)="testAddHecoNetwork()">Add Heco network</ion-button>
+    <ion-button (click)="testAddRandomNetwork()">Add non existing network</ion-button>
     <br />
     <h3>Storage</h3>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>

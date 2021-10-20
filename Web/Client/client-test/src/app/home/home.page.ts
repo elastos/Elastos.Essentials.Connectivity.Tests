@@ -72,6 +72,25 @@ export class HomePage {
     }
   }
 
+  public async testIssueCredentials() {
+    let didAccess = new ConnDID.DIDAccess();
+    let issuedCredential = await didAccess.issueCredential(
+      "did:elastos:iqeXQuCuUuZ2mdHuPUhQpQGFs4HqHixm3G",
+      ["TestCredentialType"],
+      {
+        "test": {
+          "nested": 1234,
+          "bool": true
+        },
+        "ok": "all right"
+      },
+      "#testissue"
+    );
+
+    // Result of this issuance, depending on user
+    console.log("Issued credentials:", issuedCredential);
+  }
+
   public async testImportCredentials() {
     this._testImportCredentials(false);
   }
@@ -373,6 +392,26 @@ export class HomePage {
       });
   }
 
+  public async testSignTypedData() {
+    let eip712TypedData = { "types": { "EIP712Domain": [{ "name": "name", "type": "string" }, { "name": "version", "type": "string" }, { "name": "chainId", "type": "uint256" }, { "name": "verifyingContract", "type": "address" }], "Permit": [{ "name": "owner", "type": "address" }, { "name": "spender", "type": "address" }, { "name": "value", "type": "uint256" }, { "name": "nonce", "type": "uint256" }, { "name": "deadline", "type": "uint256" }] }, "domain": { "name": "SushiSwap LP Token", "version": "1", "verifyingContract": "0x69E0E6d2783614f89dB5045aA374b68bAe646b3c", "chainId": 128 }, "primaryType": "Permit", "message": { "owner": "0xbA1ddcB94B3F8FE5d1C0b2623cF221e099f485d1", "spender": "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", "value": "259536627968409043", "nonce": 0, "deadline": 1634526493 } };
+
+    let provider = this.getActiveProvider();
+
+    this.walletConnectWeb3 = new Web3(provider);
+    const accounts = await this.walletConnectWeb3.eth.getAccounts();
+
+    console.log("Asking to sign typed data for account", accounts[0]);
+
+    let data = JSON.stringify(eip712TypedData);
+    let signedData = await provider.request({
+      method: 'eth_signTypedData_v4',
+      params: [accounts[0], data],
+      from: accounts[0]
+    });
+
+    console.log("Signed data:", signedData);
+  }
+
   public async testAddERC20() {
     /* const tokenAddress = '0x71E1EF01428138e516a70bA227659936B40f0138';
     const tokenSymbol = 'CreDa';
@@ -416,6 +455,55 @@ export class HomePage {
     }
   }
 
+  public async testSwitchToElastos() {
+    let provider = this.getActiveProvider();
+    provider.request({
+      method: 'wallet_switchEthereumChain', params: [
+        { chainId: 20 }
+      ]
+    });
+  }
+
+  public async testSwitchToHeco() {
+    let provider = this.getActiveProvider();
+    provider.request({
+      method: 'wallet_switchEthereumChain', params: [
+        { chainId: 128 }
+      ]
+    });
+  }
+
+  public async testAddHecoNetwork() {
+    let addParams = {
+      blockExplorerUrls: ['https://hecoinfo.com'],
+      chainId: "0x80",
+      chainName: "Huobi ECO Chain",
+      nativeCurrency: { name: 'HT', symbol: 'ht', decimals: 18 },
+      rpcUrls: ['https://http-mainnet.hecochain.com', 'https://http-mainnet-node.huobichain.com'],
+    }
+
+    let provider = this.getActiveProvider();
+    provider.request({
+      method: 'wallet_addEthereumChain', params: [addParams]
+    });
+  }
+
+  public async testAddRandomNetwork() {
+    let randomChainId = "0x" + Math.floor(Math.random() * 16000).toString(16);
+    let addParams = {
+      blockExplorerUrls: ['https://hecoinfo.com'],
+      chainId: randomChainId,
+      chainName: "Random network " + randomChainId,
+      nativeCurrency: { name: 'HT', symbol: 'ht', decimals: 18 },
+      rpcUrls: ['https://http-mainnet.hecochain.com', 'https://http-mainnet-node.huobichain.com'],
+    }
+
+    let provider = this.getActiveProvider();
+    provider.request({
+      method: 'wallet_addEthereumChain', params: [addParams]
+    });
+  }
+
   public async testWalletConnectDisconnect() {
     if (this.walletConnectProvider) {
       console.log("Disconnecting from wallet connect");
@@ -427,6 +515,13 @@ export class HomePage {
     else {
       console.log("Not connected to wallet connect");
     }
+  }
+
+  private getActiveProvider() {
+    if (this.walletConnectProvider)
+      return this.walletConnectProvider;
+    else
+      return window["ethereum"];
   }
 
   /*public async testHiveAuth() {
