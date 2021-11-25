@@ -234,8 +234,7 @@ export class HomePage {
       },
       //bridge: "https://walletconnect.elastos.net/v1", // Tokyo, server with the website
       //bridge: "https://walletconnect.elastos.net/v2", // Tokyo, server with the website, v2.0 "relay" server
-      //bridge: "https://wallet-connect.trinity-tech.cn/", // China
-      bridge: "https://wallet-connect.trinity-tech.cn/v2", // China
+      bridge: "https://wallet-connect.trinity-tech.io/v2", // China
       //bridge: "https://walletconnect.trinity-feeds.app/" // Tokyo, standalone server
       //bridge: "http://192.168.31.114:5001"
       //bridge: "http://192.168.1.6:5001"
