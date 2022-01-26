@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { DID, DIDBackend, DIDStore, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
 import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
+import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 
@@ -13,17 +13,138 @@ import Web3 from "web3";
 export class HomePage {
   private essentialsConnector = new EssentialsConnector();
   private walletConnectProvider: WalletConnectProvider;
-  private walletConnectWeb3: Web3;
+  private web3: Web3;
   public infoMessage: string = "";
 
   constructor(private zone: NgZone) {
     connectivity.registerConnector(this.essentialsConnector);
 
-    // Needed for hive authentication (app id credential)
-    // TODO - Now this is friend's dapp DID. Need to create a DID for this test app and configure it
-    // with proper redirect url, etc.
-    connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A");
+    // Default: use injected
+    this.useInjectedWeb3();
   }
+
+  /************
+   * SETUP
+   ************/
+
+  public async useInjectedWeb3() {
+    // Disconnect WC
+    this.disconnectWalletConnect();
+
+    console.log("Creating injected Web3 from window.ethereum");
+    if (window["ethereum"]) {
+      this.web3 = new Web3(window["ethereum"]);
+    }
+
+    this.getActiveProvider().enable();
+  }
+
+  // https://docs.walletconnect.org/quick-start/dapps/web3-provider
+  public async useCustomWalletConnect() {
+    this.createWalletConnectProvider();
+    await this.setupWalletConnectProvider();
+  }
+
+  public async useEssentialsWalletConnect() {
+    this.walletConnectProvider = this.essentialsConnector.getWalletConnectProvider();
+    if (!this.walletConnectProvider) {
+      throw new Error("Essentials connector wallet connect provider is not initializez yet. Did you run some Elastos operations first?");
+    }
+
+    await this.setupWalletConnectProvider();
+  }
+
+
+  public async disconnectWalletConnect() {
+    if (this.walletConnectProvider) {
+      console.log("Disconnecting from wallet connect");
+      //await this.walletConnectProvider.disconnect();
+      if (this.essentialsConnector.getWalletConnectProvider())
+        await this.essentialsConnector.disconnectWalletConnect(); // Essentials connector
+      else
+        await (await this.walletConnectProvider.getWalletConnector()).killSession(); // standalone WC provider
+      console.log("Disconnected from wallet connect");
+      this.walletConnectProvider = null;
+      this.web3 = null;
+    }
+    else {
+      console.log("Not connected to wallet connect");
+    }
+  }
+
+  private getActiveProvider() {
+    if (this.walletConnectProvider)
+      return this.walletConnectProvider;
+    else
+      return window["ethereum"];
+  }
+
+  private getWeb3(): Web3 {
+    return this.web3;
+  }
+
+  /**
+   * Ask wallet authorization to read accounts (ie: metamask injected)
+   */
+  /* private async requestAccounts(): Promise<void> {
+    console.log("Requesting accounts to provider");
+    const accounts = await this.getActiveProvider().request({ method: 'eth_accounts' });
+  } */
+
+  private createWalletConnectProvider(): WalletConnectProvider {
+    //  Create WalletConnect Provider
+    this.walletConnectProvider = new WalletConnectProvider({
+      rpc: {
+        20: "https://api.elastos.io/eth",
+        21: "https://api-testnet.elastos.io/eth",
+        128: "https://http-mainnet.hecochain.com" // Heco mainnet
+      },
+      //bridge: "https://walletconnect.elastos.net/v1", // Tokyo, server with the website
+      //bridge: "https://walletconnect.elastos.net/v2", // Tokyo, server with the website, v2.0 "relay" server
+      //bridge: "https://wallet-connect.trinity-tech.cn/", // China
+      //bridge: "https://walletconnect.trinity-tech.cn/v2",
+      bridge: "https://c.bridge.walletconnect.org",
+      //bridge: "https://walletconnect.trinity-feeds.app/" // Tokyo, standalone server
+      //bridge: "http://192.168.31.114:5001"
+      //bridge: "http://192.168.1.6:5001"
+    });
+    return this.walletConnectProvider;
+  }
+
+  private async setupWalletConnectProvider() {
+    console.log("Connected?", this.walletConnectProvider.connected);
+
+    // Subscribe to accounts change
+    this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
+      console.log(accounts);
+    });
+
+    // Subscribe to chainId change
+    this.walletConnectProvider.on("chainChanged", (chainId: number) => {
+      console.log(chainId);
+    });
+
+    // Subscribe to session disconnection
+    this.walletConnectProvider.on("disconnect", (code: number, reason: string) => {
+      console.log("ON DISCONNECT", code, reason);
+    });
+
+    // Subscribe to session disconnection
+    this.walletConnectProvider.on("error", (code: number, reason: string) => {
+      console.error(code, reason);
+    });
+
+    //  Enable session (triggers QR Code modal)
+    console.log("Connecting to wallet connect");
+    let enabled = await this.walletConnectProvider.enable();
+    console.log("CONNECTED to wallet connect from tests", enabled, this.walletConnectProvider);
+
+    this.web3 = new Web3(this.walletConnectProvider as any); // HACK
+  }
+
+  /************
+   * IDENTITY
+   ************/
 
   public async testGetCredentials() {
     this.infoMessage = "";
@@ -72,6 +193,68 @@ export class HomePage {
     }
   }
 
+  public async testRequestCredentials(testName: string) {
+    this.infoMessage = "";
+
+    let request: ConnDID.CredentialDisclosureRequest = null;
+    switch (testName) {
+      case 'nametype':
+        request = {
+          claims: [
+            ConnDID.standardNameClaim("Your name").withNoMatchRecommendations([
+              { title: "A provider", url: "https://the.provider.com/getAcredential", urlTarget: "external" }
+            ])
+          ]
+        }
+        break;
+      case 'kyc':
+        request = {
+          claims: [
+            ConnDID.standardNameClaim("Your name").withNoMatchRecommendations([
+              { title: "Trinity-Tech KYC-Me", url: "https://kyc-me.trinity-tech.io", urlTarget: "internal" }
+            ]),
+            ConnDID.simpleTypeClaim("Your nationality", "NationalityCredential", true).withNoMatchRecommendations([
+              { title: "Trinity-Tech KYC-Me", url: "https://kyc-me.trinity-tech.io", urlTarget: "internal" }
+            ]),
+            ConnDID.simpleTypeClaim("Your birth date", "BirthDateCredential", true).withNoMatchRecommendations([
+              { title: "Trinity-Tech KYC-Me", url: "https://kyc-me.trinity-tech.io", urlTarget: "internal" }
+            ])
+          ]
+        }
+        break;
+      case 'nameid':
+        request = { claims: [ConnDID.simpleIdClaim("Your name", "name")] } // Equivalent to the deprecated getCredentials() with claim "name"
+        break;
+      case 'nameemailidopt':
+        request = {
+          claims: [
+            ConnDID.simpleIdClaim("Your name", "name"),
+            ConnDID.simpleIdClaim("Your email address", "email", false) // Optional email
+          ]
+        }
+        break;
+      case 'nameidwithinexistingissuer':
+        request = {
+          claims: [ConnDID.simpleIdClaim("Your name", "name").withIssuers([
+            "did:elastos:inexisting",
+            //"did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq"
+          ])]
+        } // Equivalent to the deprecated getCredentials() with claim "name"
+        break;
+    }
+
+    let didAccess = new ConnDID.DIDAccess();
+    console.log("Trying to request credentials");
+    let presentation = await didAccess.requestCredentials(request);
+
+    if (presentation) {
+      console.log("Got presentation:", presentation);
+    }
+    else {
+      console.warn("Empty presentation returned, something wrong happened, or operation was cancelled");
+    }
+  }
+
   public async testIssueCredentials() {
     let didAccess = new ConnDID.DIDAccess();
     let issuedCredential = await didAccess.issueCredential(
@@ -84,7 +267,7 @@ export class HomePage {
         },
         "ok": "all right"
       },
-      "#testissue"
+      "testissue"
     );
 
     // Result of this issuance, depending on user
@@ -125,9 +308,13 @@ export class HomePage {
 
     // Create the credential
     let vcb = new VerifiableCredential.Builder(issuer, targetDID);
-    let credential = await vcb.id("#creda").properties({
-      wallet1: "xxxx",
-      wallet2: "xxxx"
+    let credential = await vcb.id("#prescription").properties({
+      prescription1: "Take 3 pills per day during one week.",
+      displayable: {
+        icon: "nowhere",
+        title: "Medical certificate",
+        description: "${prescription1}"
+      }
     }).type("TestCredentialType").seal(storePass);
     console.log("Generated credential:", credential);
 
@@ -181,9 +368,18 @@ export class HomePage {
     console.log("Signed data:", signedData);
   }
 
-  public async testGetAppIDCredential() {
+  public async testGetAppIDCredential(mode: string) {
     let didAccess = new ConnDID.DIDAccess();
-    console.log("Trying to get an app id credential");
+
+    console.log(`Trying to get an app id credential (${mode})`);
+
+    if (mode === "published")
+      connectivity.setApplicationDID("did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ"); // TestApp's DID
+    else if (mode === "publishednoinfo")
+      connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A"); // Unmaintained but published DID
+    else
+      connectivity.setApplicationDID("did:elastos:abcdef"); // Inexisting
+
     let credential = await didAccess.generateAppIdCredential();
     console.log("App id credential:", credential);
   }
@@ -217,6 +413,10 @@ export class HomePage {
     console.log("Got DID didtransaction custom request response", result);
   }
 
+  /*****************
+   * ELASTOS: OTHERS
+   *****************/
+
   public async testPay() {
     let wallet = new Wallet.WalletAccess();
     console.log("Trying to get credentials");
@@ -224,79 +424,9 @@ export class HomePage {
     console.log("Pay response", response);
   }
 
-  private createWalletConnectProvider(): WalletConnectProvider {
-    //  Create WalletConnect Provider
-    this.walletConnectProvider = new WalletConnectProvider({
-      rpc: {
-        20: "https://api.elastos.io/eth",
-        21: "https://api-testnet.elastos.io/eth",
-        128: "https://http-mainnet.hecochain.com" // Heco mainnet
-      },
-      //bridge: "https://walletconnect.elastos.net/v1", // Tokyo, server with the website
-      //bridge: "https://walletconnect.elastos.net/v2", // Tokyo, server with the website, v2.0 "relay" server
-      bridge: "https://wallet-connect.trinity-tech.io/v2", // China
-      //bridge: "https://walletconnect.trinity-feeds.app/" // Tokyo, standalone server
-      //bridge: "http://192.168.31.114:5001"
-      //bridge: "http://192.168.1.6:5001"
-    });
-    return this.walletConnectProvider;
-  }
-
-  private async setupWalletConnectProvider() {
-    console.log("Connected?", this.walletConnectProvider.connected);
-
-    // Subscribe to accounts change
-    this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
-      console.log(accounts);
-    });
-
-    // Subscribe to chainId change
-    this.walletConnectProvider.on("chainChanged", (chainId: number) => {
-      console.log(chainId);
-    });
-
-    // Subscribe to session disconnection
-    this.walletConnectProvider.on("disconnect", (code: number, reason: string) => {
-      console.log(code, reason);
-    });
-
-    // Subscribe to session disconnection
-    this.walletConnectProvider.on("error", (code: number, reason: string) => {
-      console.error(code, reason);
-    });
-
-    //  Enable session (triggers QR Code modal)
-    console.log("Connecting to wallet connect");
-    let enabled = await this.walletConnectProvider.enable();
-    console.log("CONNECTED to wallet connect", enabled, this.walletConnectProvider);
-
-    this.walletConnectWeb3 = new Web3(this.walletConnectProvider as any); // HACK
-  }
-
-  // https://docs.walletconnect.org/quick-start/dapps/web3-provider
-  public async testWalletConnectConnectCustom() {
-    this.createWalletConnectProvider();
-    await this.setupWalletConnectProvider();
-    this.essentialsConnector.setWalletConnectProvider(this.walletConnectProvider);
-
-    //  Get Chain Id
-    /* const chainId = await this.walletConnectWeb3.eth.getChainId();
-    console.log("Chain ID: ", chainId);
-
-    if (chainId != 20 && chainId != 21) {
-      console.error("ERROR: Connected to wrong ethereum network "+chainId+". Not an elastos network. Check that the wallet app is using an Elastos network.");
-      return;
-    } */
-  }
-
-  public async testWalletConnectConnectFromEssentialsConnector() {
-    this.walletConnectProvider = this.essentialsConnector.getWalletConnectProvider();
-    if (!this.walletConnectProvider) {
-      throw new Error("Essentials connector wallet connect provider is not initializez yet. Did you run some Elastos operations first?");
-    }
-
-    await this.setupWalletConnectProvider();
-  }
+  /************
+   * ETHEREUM
+   ************/
 
   public async testWalletConnectCustomRequest() {
     let connector = await this.walletConnectProvider.getWalletConnector();
@@ -315,28 +445,34 @@ export class HomePage {
     console.log("Got custom request response", result);
   }
 
-  public async testETHCall() {
-    const accounts = await this.walletConnectWeb3.eth.getAccounts();
+  private async getUserAccount(): Promise<string> {
+    let accounts = await this.getWeb3().eth.getAccounts();
+    if (!accounts || accounts.length == 0) {
+      throw new Error("No EVM account available");
+    }
+    return accounts[0];
+  }
 
+  public async testETHCall() {
     let contractAbi = require("../../assets/erc721.abi.json");
     let contractAddress = "0x5b462bac2d07223711aA0e911c846e5e0E787654"; // Elastos Testnet
-    let contract = new this.walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+    let contract = new (this.getWeb3()).eth.Contract(contractAbi, contractAddress);
 
-    let gasPrice = await this.walletConnectWeb3.eth.getGasPrice();
+    let gasPrice = await this.getWeb3().eth.getGasPrice();
     console.log("Gas price:", gasPrice);
 
-    console.log("Sending transaction with account address:", accounts[0]);
+    console.log("Sending transaction with account address:", await this.getUserAccount());
     let transactionParams = {
-      from: accounts[0],
+      from: await this.getUserAccount(),
       gasPrice: gasPrice,
       gas: 5000000,
       value: 0
     };
 
-    let address = accounts[0];
+    let address = await this.getUserAccount();
     let tokenId = Math.floor(Math.random() * 10000000000);
     let tokenUri = "https://my.token.uri.com";
-    console.log("Calling smart contract through wallet connect", address, tokenId, tokenUri);
+    console.log("Calling smart contract", address, tokenId, tokenUri);
     contract.methods.mint(address, tokenId, tokenUri).send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log("transactionHash", hash);
@@ -392,12 +528,11 @@ export class HomePage {
   }
 
   public async testSignTypedData() {
-    let eip712TypedData = { "types": { "EIP712Domain": [{ "name": "name", "type": "string" }, { "name": "version", "type": "string" }, { "name": "chainId", "type": "uint256" }, { "name": "verifyingContract", "type": "address" }], "Permit": [{ "name": "owner", "type": "address" }, { "name": "spender", "type": "address" }, { "name": "value", "type": "uint256" }, { "name": "nonce", "type": "uint256" }, { "name": "deadline", "type": "uint256" }] }, "domain": { "name": "SushiSwap LP Token", "version": "1", "verifyingContract": "0x69E0E6d2783614f89dB5045aA374b68bAe646b3c", "chainId": 128 }, "primaryType": "Permit", "message": { "owner": "0xbA1ddcB94B3F8FE5d1C0b2623cF221e099f485d1", "spender": "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", "value": "259536627968409043", "nonce": 0, "deadline": 1634526493 } };
+    let eip712TypedData = { "types": { "EIP712Domain": [{ "name": "name", "type": "string" }, { "name": "version", "type": "string" }, { "name": "chainId", "type": "uint256" }, { "name": "verifyingContract", "type": "address" }], "Permit": [{ "name": "owner", "type": "address" }, { "name": "spender", "type": "address" }, { "name": "value", "type": "uint256" }, { "name": "nonce", "type": "uint256" }, { "name": "deadline", "type": "uint256" }] }, "domain": { "name": "SushiSwap LP Token", "version": "1", "verifyingContract": "0x69E0E6d2783614f89dB5045aA374b68bAe646b3c", "chainId": 20 }, "primaryType": "Permit", "message": { "owner": "0xbA1ddcB94B3F8FE5d1C0b2623cF221e099f485d1", "spender": "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", "value": "259536627968409043", "nonce": 0, "deadline": 1634526493 } };
 
     let provider = this.getActiveProvider();
 
-    this.walletConnectWeb3 = new Web3(provider);
-    const accounts = await this.walletConnectWeb3.eth.getAccounts();
+    const accounts = await this.getWeb3().eth.getAccounts();
 
     console.log("Asking to sign typed data for account", accounts[0]);
 
@@ -409,6 +544,17 @@ export class HomePage {
     });
 
     console.log("Signed data:", signedData);
+  }
+
+  public testEthSign() {
+
+  }
+
+  public async testPersonalSign() {
+    let account = await this.getUserAccount();
+    let message = "Here is a personal message to sign";
+    const signature = await this.getActiveProvider().request({ method: 'personal_sign', params: [message, account] });
+    console.log("Signature:", signature);
   }
 
   public async testAddERC20() {
@@ -423,14 +569,10 @@ export class HomePage {
     const tokenImage = 'http://placekitten.com/200/300';
 
     try {
-      // wasAdded is a boolean. Like any RPC method, an error may be thrown.
-      let ethereum = this.walletConnectProvider; // window["ethereum"];
-
-      this.walletConnectWeb3 = new Web3(ethereum as any);
-      const accounts = await this.walletConnectWeb3.eth.getAccounts();
+      const accounts = await this.getWeb3().eth.getAccounts();
       console.log("Accounts", accounts);
 
-      const wasAdded = await ethereum.request({
+      const wasAdded = await this.getActiveProvider().request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20', // Initially only supports ERC20, but eventually more!
@@ -458,7 +600,7 @@ export class HomePage {
     let provider = this.getActiveProvider();
     provider.request({
       method: 'wallet_switchEthereumChain', params: [
-        { chainId: 20 }
+        { chainId: '0x14' }
       ]
     });
   }
@@ -467,7 +609,7 @@ export class HomePage {
     let provider = this.getActiveProvider();
     provider.request({
       method: 'wallet_switchEthereumChain', params: [
-        { chainId: 128 }
+        { chainId: '0x80' }
       ]
     });
   }
@@ -501,26 +643,6 @@ export class HomePage {
     provider.request({
       method: 'wallet_addEthereumChain', params: [addParams]
     });
-  }
-
-  public async testWalletConnectDisconnect() {
-    if (this.walletConnectProvider) {
-      console.log("Disconnecting from wallet connect");
-      //await this.walletConnectProvider.disconnect();
-      await (await this.walletConnectProvider.getWalletConnector()).killSession();
-      console.log("Disconnected from wallet connect");
-      this.walletConnectProvider = null;
-    }
-    else {
-      console.log("Not connected to wallet connect");
-    }
-  }
-
-  private getActiveProvider() {
-    if (this.walletConnectProvider)
-      return this.walletConnectProvider;
-    else
-      return window["ethereum"];
   }
 
   /*public async testHiveAuth() {
@@ -589,7 +711,34 @@ export class HomePage {
   }*/
 
   public testUnlinkEssentialsConnection() {
-    this.essentialsConnector.unlinkEssentialsDevice();
+    //this.essentialsConnector.disconnectWalletConnect();
+  }
+
+  public startCamera() {
+    var constraints = {
+      audio: false,
+      video: true
+    };
+
+    console.log("navigator", navigator);
+    console.log("navigator.mediaDevices", navigator.mediaDevices);
+
+    navigator.mediaDevices.getUserMedia(constraints).then(function (mediaStream) {
+      var video = document.querySelector('video');
+      video.srcObject = mediaStream;
+      video.play();
+    }).catch(function (err) {
+      console.log("There's an error!" + err.message);
+    });
+  }
+
+  public essNetHref() {
+    const mobileLinkUrl = "https://essentials.elastos.net/wc";
+    window.location.href = mobileLinkUrl;
+  }
+
+  public essNetWindow() {
+    window.open("https://essentials.elastos.net/wc", '_blank');
   }
 }
 

@@ -2,8 +2,22 @@
   <div id="container">
     <br />
     <h2>{{infoMessage}}</h2>
-    <h3>Identity</h3>
-    <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
+
+    <h3>Setup</h3>
+    <ion-button (click)="useInjectedWeb3()">Use injected</ion-button>
+    <ion-button (click)="useCustomWalletConnect()">Use custom WC</ion-button>
+    <ion-button (click)="useEssentialsWalletConnect()">Use Essentials connector WC'</ion-button>
+    <ion-button (click)="disconnectWalletConnect()">Disconnect WC</ion-button>
+    <br />
+
+    <h3>Elastos: Identity</h3>
+    <ion-button (click)="testGetCredentials()">Get Credentials (v1)</ion-button>
+    <ion-button (click)="testRequestCredentials('nametype')">Req. Cred. - name type</ion-button>
+    <ion-button (click)="testRequestCredentials('nameid')">Req. Cred. - name id</ion-button>
+    <ion-button (click)="testRequestCredentials('kyc')">Req. Cred. - kyc by type</ion-button>
+    <ion-button (click)="testRequestCredentials('nameemailidopt')">Req. Cred. - name id, email id opt</ion-button>
+    <ion-button (click)="testRequestCredentials('nameidwithinexistingissuer')">Req. Cred. - name id with inex. issuer
+    </ion-button>
     <br />
     <ion-button (click)="testIssueCredentials()">Issue a credential for others</ion-button>
     <br />
@@ -17,20 +31,27 @@
     <br />
     <ion-button (click)="testRequestPublish()">Request Publish</ion-button>
     <br />
-    <ion-button (click)="testSignDIDData()">Sign data</ion-button>
+    <ion-button (click)="testSignDIDData()">Sign data wit hDID</ion-button>
     <br />
     <ion-button (click)="testDIDTransaction()">Publish DID Transaction</ion-button>
     <br />
-    <ion-button (click)="testGetAppIDCredential()">Get app ID credential</ion-button>
+    <ion-button (click)="testGetAppIDCredential('published')">Get app ID cred (published)</ion-button>
+    <ion-button (click)="testGetAppIDCredential('publishednoinfo')">Get app ID cred (published no info)</ion-button>
+    <ion-button (click)="testGetAppIDCredential('unpublished')">Get app ID cred (unpublished)</ion-button>
     <br />
-    <h3>Payments</h3>
+
+    <h3>Elastos: Others</h3>
     <ion-button (click)="testPay()">Test Pay</ion-button>
     <br />
-    <ion-button (click)="testETHCall()">Test ETH call</ion-button>
-    <br />
+
+    <h3>ETH: Signing</h3>
     <ion-button (click)="testSignTypedData()">Test ETH sign typed data</ion-button>
+    <ion-button (click)="testEthSign()">eth_sign</ion-button>
+    <ion-button (click)="testPersonalSign()">personal_sign</ion-button>
     <br />
-    <ion-button (click)="testInjectedETHCall()">Test injected ETH call</ion-button>
+
+    <h3>ETH</h3>
+    <ion-button (click)="testETHCall()">Test ETH call</ion-button>
     <br />
     <ion-button (click)="testAddERC20()">Add ERC20 token</ion-button>
     <br />
@@ -40,25 +61,22 @@
     <ion-button (click)="testAddHecoNetwork()">Add Heco network</ion-button>
     <ion-button (click)="testAddRandomNetwork()">Add non existing network</ion-button>
     <br />
+
     <h3>Storage</h3>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>
     <br />
-    <br />
-    <br />
-    <h3>Utilities</h3>
-    <ion-button (click)="testWalletConnectConnectCustom()">Wallet connect: connect app custom</ion-button>
-    <ion-button (click)="testWalletConnectConnectFromEssentialsConnector()">Wallet connect: use essentials'</ion-button>
-    <ion-button (click)="testWalletConnectDisconnect()">Wallet connect: disconnect</ion-button>
-    <br />
+
+    <h3>Wallet connect</h3>
     <ion-button (click)="testWalletConnectCustomRequest()">Wallet connect: custom request</ion-button>
     <br />
-    <br />
+
     <h3>Other tests</h3>
+    <ion-button (click)="essNetHref()">Ess.net href</ion-button>
+    <ion-button (click)="essNetWindow()">Ess.net win open</ion-button>
     <a href="https://wallet.elastos.net/pay?amount=12" target="_blank">Pay link</a>
-    <br />
-    <br />
-    <br />
-    <br />
+    <ion-button (click)="startCamera()">Start camera</ion-button>
+    <video style="width: 300px; height: 200px"></video>
+
     <!--<ion-button (click)="testHiveAuth()">Hive Auth</ion-button>
     <br/>
     <ion-button (click)="unselectActiveConnector()">Forget current connector</ion-button>
