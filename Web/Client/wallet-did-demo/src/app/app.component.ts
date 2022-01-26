@@ -2,6 +2,10 @@ import { Component } from '@angular/core';
 import { connectivity, DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
 
+function ofType(type: string): string {
+  return '$.type[?(@ == "' + type + '")]';
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -17,10 +21,13 @@ export class AppComponent {
 
   async connect() {
     let didAccess = new DID.DIDAccess();
+    let claims = {
+      [ofType("WalletCredential")]: false
+    };
+    console.log("claims", claims);
+
     let presentation = await didAccess.getCredentials({
-      claims: {
-        name: false
-      }
+      claims
     });
 
     if (presentation) {
