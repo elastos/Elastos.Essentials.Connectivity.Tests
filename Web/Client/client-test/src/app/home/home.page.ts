@@ -21,6 +21,9 @@ export class HomePage {
 
     // Default: use injected
     this.useInjectedWeb3();
+
+    // Default: use a test app DID for connectivity api calls
+    this.useApplicationDID();
   }
 
   /************
@@ -53,7 +56,6 @@ export class HomePage {
 
     await this.setupWalletConnectProvider();
   }
-
 
   public async disconnectWalletConnect() {
     if (this.walletConnectProvider) {
@@ -140,6 +142,17 @@ export class HomePage {
     console.log("CONNECTED to wallet connect from tests", enabled, this.walletConnectProvider);
 
     this.web3 = new Web3(this.walletConnectProvider as any); // HACK
+  }
+
+  public useApplicationDID() {
+    let callerDID = "did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ"; // TestApp's DID
+    connectivity.setApplicationDID(callerDID);
+    console.log("Using application DID " + callerDID, connectivity);
+  }
+
+  public clearApplicationDID() {
+    connectivity.setApplicationDID(null);
+    console.log("Clearing application DID");
   }
 
   /************
@@ -368,6 +381,14 @@ export class HomePage {
     console.log("Signed data:", signedData);
   }
 
+  public async testSetHiveAddress() {
+    let didAccess = new ConnDID.DIDAccess();
+    console.log("Trying to change hive vault address");
+    //let status = await didAccess.updateHiveVaultAddress("https://my.vault.com", "My cool vault");
+    let status = await didAccess.updateHiveVaultAddress("https://hive2.trinity-tech.io", "My cool vault");
+    console.log("Hive address change result:", status);
+  }
+
   public async testGetAppIDCredential(mode: string) {
     let didAccess = new ConnDID.DIDAccess();
 
@@ -532,22 +553,33 @@ export class HomePage {
 
     let provider = this.getActiveProvider();
 
-    const accounts = await this.getWeb3().eth.getAccounts();
+    const account = await this.getUserAccount();
 
-    console.log("Asking to sign typed data for account", accounts[0]);
+    console.log("Asking to sign typed data for account", account);
 
     let data = JSON.stringify(eip712TypedData);
     let signedData = await provider.request({
       method: 'eth_signTypedData_v4',
-      params: [accounts[0], data],
-      from: accounts[0]
+      params: [account, data],
+      from: account
     });
 
     console.log("Signed data:", signedData);
   }
 
-  public testEthSign() {
+  public async testEthSign() {
+    const account = await this.getUserAccount();
 
+    console.log("Calling eth_sign");
+
+    var hash = this.getWeb3().utils.sha3("Message to sign");
+    let signedData = await this.getActiveProvider().request({
+      method: 'eth_sign',
+      params: [account, hash],
+      from: account
+    });
+
+    console.log("Signed eth_sign data:", signedData);
   }
 
   public async testPersonalSign() {

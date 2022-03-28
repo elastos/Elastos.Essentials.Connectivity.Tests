@@ -9,6 +9,9 @@
     <ion-button (click)="useEssentialsWalletConnect()">Use Essentials connector WC'</ion-button>
     <ion-button (click)="disconnectWalletConnect()">Disconnect WC</ion-button>
     <br />
+    <ion-button (click)="useApplicationDID()">Use application DID</ion-button>
+    <ion-button (click)="clearApplicationDID()">Clear application DID</ion-button>
+    <br />
 
     <h3>Elastos: Identity</h3>
     <ion-button (click)="testGetCredentials()">Get Credentials (v1)</ion-button>
@@ -31,7 +34,9 @@
     <br />
     <ion-button (click)="testRequestPublish()">Request Publish</ion-button>
     <br />
-    <ion-button (click)="testSignDIDData()">Sign data wit hDID</ion-button>
+    <ion-button (click)="testSignDIDData()">Sign data with DID</ion-button>
+    <br />
+    <ion-button (click)="testSetHiveAddress()">Set hive vault address</ion-button>
     <br />
     <ion-button (click)="testDIDTransaction()">Publish DID Transaction</ion-button>
     <br />
