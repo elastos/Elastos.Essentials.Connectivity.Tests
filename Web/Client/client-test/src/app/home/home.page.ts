@@ -1,9 +1,11 @@
 import { Component, NgZone } from '@angular/core';
-import { DID, DIDBackend, DIDStore, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
+import { DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
 import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
+import { AppContext, FindExecutable } from '@elastosfoundation/hive-js-sdk';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
+import { BrowserConnectivitySDKHiveAuthHelper } from './hive.auth.helper';
 
 @Component({
   selector: 'app-home',
@@ -254,6 +256,13 @@ export class HomePage {
           ])]
         } // Equivalent to the deprecated getCredentials() with claim "name"
         break;
+      case 'imported':
+        request = {
+          claims: [
+            ConnDID.simpleTypeClaim("To populate your profile", "did://elastos/insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq/BenCredential9733350#BenCredential")
+          ]
+        }
+        break;
     }
 
     let didAccess = new ConnDID.DIDAccess();
@@ -266,6 +275,14 @@ export class HomePage {
     else {
       console.warn("Empty presentation returned, something wrong happened, or operation was cancelled");
     }
+  }
+
+  async deleteme() {
+    let presentation = await new ConnDID.DIDAccess().requestCredentials({
+      claims: [
+        ConnDID.simpleTypeClaim("To populate your profile", "did://elastos/xxx/DiplomaCredential1212#DiplomaCredential")
+      ]
+    });
   }
 
   public async testIssueCredentials() {
@@ -305,6 +322,7 @@ export class HomePage {
 
     // For this test, always re-create a new identity for the signer of the created credential.
     // In real life, the signer should remain the same.
+    Features.enableJsonLdContext(true);
     DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.MAINNET));
     let didStore = await DIDStore.open(storeId);
     let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
@@ -321,14 +339,16 @@ export class HomePage {
 
     // Create the credential
     let vcb = new VerifiableCredential.Builder(issuer, targetDID);
-    let credential = await vcb.id("#prescription").properties({
-      prescription1: "Take 3 pills per day during one week.",
-      displayable: {
-        icon: "nowhere",
-        title: "Medical certificate",
-        description: "${prescription1}"
-      }
-    }).type("TestCredentialType").seal(storePass);
+    let credential = await vcb.id("#beninstance1268")
+      .properties({
+        //prescription1: "Take 3 pills per day during one week.",
+        stub: "test",
+        displayable: {
+          icon: "nowhere",
+          title: "Medical certificate",
+          description: "${prescription1}"
+        }
+      }).type("did://elastos/insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq/CredTypeWithService#CredTypeWithService").seal(storePass);
     console.log("Generated credential:", credential);
 
     // Send the credential to the identity wallet (essentials)
@@ -341,6 +361,70 @@ export class HomePage {
 
     // Result of this import, depending on user
     console.log("Imported credentials:", importedCredentials);
+  }
+
+  public async testImportCredentialContext() {
+    this.infoMessage = "";
+
+    console.log("Creating and importing a credential context");
+    let storeId = "client-side-store";
+    let storePass = "unsafepass";
+    let passphrase = ""; // Mnemonic passphrase
+
+    // For this test, always re-create a new identity for the signer of the created credential.
+    // In real life, the signer should remain the same.
+    Features.enableJsonLdContext(true);
+    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.MAINNET));
+    let didStore = await DIDStore.open(storeId);
+    let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
+    console.log("Created identity:", rootIdentity);
+
+    let issuerDID = await rootIdentity.newDid(storePass, 0, true); // Index 0, overwrite
+    console.log("Issuer DID:", issuerDID);
+
+    let issuer = new Issuer(issuerDID);
+    console.log("Issuer:", issuer);
+
+    let targetDID = DID.from("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
+    console.log("Target DID:", targetDID);
+
+    // Create the credential
+    let vcb = new VerifiableCredential.Builder(issuer, targetDID);
+    let serviceName = "MyCredContext1"; // stable
+    let credentialId = "#MyCredContext1" + Math.random(); // updated for each update
+    let context = {
+      "@version": 1.1,
+      "schema": "http://schema.org/",
+      "stub": {
+        "@id": "did://elastos/insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq/" + credentialId + "#stub",
+        "@type": "xsd:string"
+      },
+      "xsd": "http://www.w3.org/2001/XMLSchema#"
+    }
+    context[serviceName] = "did://elastos/insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq/" + credentialId + "#" + serviceName;
+
+    let credential = await vcb.id(credentialId)
+      // This credential is a special "credential type" credential
+      .typeWithContext("ContextDefCredential", "https://ns.elastos.org/credentials/context/v1")
+      // Make the credential nicely displayable
+      .typeWithContext("DisplayableCredential", "https://ns.elastos.org/credentials/displayable/v1")
+      .properties({
+        "@context": context,
+        displayable: {
+          title: `This is a cred context`,
+          description: "Credential descriptor for developers to use as credential type in applications",
+          //icon: "some url" // TODO
+        }
+      })
+      .seal(storePass);
+    console.log("Generated credential:", credential);
+
+    // Send the credential to the identity wallet (essentials)
+    let didAccess = new ConnDID.DIDAccess();
+    let importedCredential = await didAccess.importCredentialContext(serviceName, credential);
+
+    // Result of this import, depending on user
+    console.log("Imported credential context:", importedCredential);
   }
 
   public async testDeleteCredential() {
@@ -387,6 +471,18 @@ export class HomePage {
     //let status = await didAccess.updateHiveVaultAddress("https://my.vault.com", "My cool vault");
     let status = await didAccess.updateHiveVaultAddress("https://hive2.trinity-tech.io", "My cool vault");
     console.log("Hive address change result:", status);
+  }
+
+  public async testHiveBackupCredential() {
+    let didAccess = new ConnDID.DIDAccess();
+
+    console.log(`Trying to get a hive backup credential`);
+
+    let sourceNodeDID = "did:elastos:sourcenode";
+    let targetNodeDID = "did:elastos:backupnode";
+    let targetNodeUrl = "https://node.trinity-tech.io";
+    let credential = await didAccess.generateHiveBackupCredential(sourceNodeDID, targetNodeDID, targetNodeUrl);
+    console.log("Hive backup credential:", credential);
   }
 
   public async testGetAppIDCredential(mode: string) {
@@ -677,70 +773,77 @@ export class HomePage {
     });
   }
 
-  /*public async testHiveAuth() {
-    let vault = await this.getVault();
+  public async testHive() {
+    let hiveAuthHelper = new BrowserConnectivitySDKHiveAuthHelper("mainnet");
 
-    let callResult = await vault.getScripting().setScript("inexistingScript", hiveManager.Scripting.Executables.Database.newFindOneQuery("inexistingCollection"));
-    console.log("Hive script call result:", callResult);
-    if (callResult)
+    console.log("Fetching hive provider address");
+
+    let targetDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq";
+    let providerAddress = await AppContext.getProviderAddress(targetDid); // TODO: cache, don't resolve every time
+
+    console.log("Got hive provider address", providerAddress);
+    console.log("Initializing vault services");
+
+    let vaultServices = await hiveAuthHelper.getVaultServices(targetDid, providerAddress);
+
+    console.log("Vault services initialized");
+
+    let scriptingService = vaultServices.getScriptingService();
+
+    try {
+      console.log("Registering a test script");
+      await scriptingService.registerScript("inexistingScript",
+        new FindExecutable("inexistingScript", "inexistingCollection", {}, {})
+      );
       alert("All good");
-    else
+    }
+    catch (e) {
+      console.error("Hive script registration error:", e);
       alert("Failed to call hive scripting API. Something wrong happened.");
+    }
   }
 
-  private async getVault(): Promise<HivePlugin.Vault> {
-    let authHelper = new Hive.AuthHelper();
-    let hiveClient = await authHelper.getClientWithAuth((e)=>{
-      console.log('auth error');
-    });
-    console.log('getClientWithAuth:', hiveClient);
+  /*
+    public async unselectActiveConnector() {
+      connectivity.setActiveConnector(null);
+    }
 
-    let vault = await hiveClient.getVault("did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq");
-    console.log("Got vault", vault);
+    public async revokeHiveAuthToken() {
+      let vault = await this.getVault();
+      vault.revokeAccessToken();
+    }
 
-    return vault;
-  }
-/*
-  public async unselectActiveConnector() {
-    connectivity.setActiveConnector(null);
-  }
+    public deleteLocalStorage() {
+      window.localStorage.clear();
+    }
 
-  public async revokeHiveAuthToken() {
-    let vault = await this.getVault();
-    vault.revokeAccessToken();
-  }
+    public manageLocalIdentity() {
+      localIdentity.manageIdentity();
+    }
 
-  public deleteLocalStorage() {
-    window.localStorage.clear();
-  }
+    public setLanguage(lang: string) {
+      localization.setLanguage(lang);
+    }
 
-  public manageLocalIdentity() {
-    localIdentity.manageIdentity();
-  }
+    public setDarkMode(useDarkMode: boolean) {
+      theme.enableDarkMode(useDarkMode);
+    }
 
-  public setLanguage(lang: string) {
-    localization.setLanguage(lang);
-  }
+    public registerEssentialsConnector() {
+      connectivity.registerConnector(this.essentialsConnector);
+    }
 
-  public setDarkMode(useDarkMode: boolean) {
-    theme.enableDarkMode(useDarkMode);
-  }
+    public unregisterEssentialsConnector() {
+      connectivity.unregisterConnector(this.essentialsConnector.name);
+    }
 
-  public registerEssentialsConnector() {
-    connectivity.registerConnector(this.essentialsConnector);
-  }
+    public registerLocalConnector() {
+      connectivity.registerConnector(this.localIdentityConnector);
+    }
 
-  public unregisterEssentialsConnector() {
-    connectivity.unregisterConnector(this.essentialsConnector.name);
-  }
-
-  public registerLocalConnector() {
-    connectivity.registerConnector(this.localIdentityConnector);
-  }
-
-  public unregisterLocalConnector() {
-    connectivity.unregisterConnector(this.localIdentityConnector.name);
-  }*/
+    public unregisterLocalConnector() {
+      connectivity.unregisterConnector(this.localIdentityConnector.name);
+    }*/
 
   public testUnlinkEssentialsConnection() {
     //this.essentialsConnector.disconnectWalletConnect();
