@@ -2,10 +2,11 @@ import { Component, NgZone } from '@angular/core';
 import { DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
 import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import { FindExecutable } from '@elastosfoundation/hive-js-sdk';
+import { FindExecutable, ScriptRunner } from '@elastosfoundation/hive-js-sdk';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 import { BrowserConnectivitySDKHiveAuthHelper } from './hive.auth.helper';
+import { rawImageToBase64DataUrl, transparentPixelIconDataUrl } from './picture.helpers';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +18,7 @@ export class HomePage {
   private walletConnectProvider: WalletConnectProvider;
   private web3: Web3;
   public infoMessage: string = "";
+  public hiveAvatarDataUrl = transparentPixelIconDataUrl();
 
   constructor(private zone: NgZone) {
     connectivity.registerConnector(this.essentialsConnector);
@@ -776,14 +778,16 @@ export class HomePage {
   public async testHive() {
     let hiveAuthHelper = new BrowserConnectivitySDKHiveAuthHelper("mainnet");
 
-    let targetDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq";
+    let userDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq";
 
     console.log("Initializing vault services");
-    let vaultServices = await hiveAuthHelper.getVaultServices(targetDid);
+    let vaultServices = await hiveAuthHelper.getVaultServices(userDid);
 
     console.log("Vault services initialized");
 
     let scriptingService = vaultServices.getScriptingService();
+
+    //vaultServices.getScriptingService().downloadFileByHiveUrl()
 
     try {
       console.log("Registering a test script");
@@ -796,6 +800,19 @@ export class HomePage {
       console.error("Hive script registration error:", e);
       alert("Failed to call hive scripting API. Something wrong happened.");
     }
+  }
+
+  public async testHiveDownloadAvatar() {
+    let hiveAuthHelper = new BrowserConnectivitySDKHiveAuthHelper("mainnet");
+    let userDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq"; // Current user, needs authentication for now, even to get a public hive url
+    let appContext = await hiveAuthHelper.getAppContext(userDid);
+
+    let hiveAvatarUrl = "hive://did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1632229804041?params={\"empty\":0}";
+    let scriptRunner = new ScriptRunner(appContext);
+    let avatarBuffer = await scriptRunner.downloadFileByHiveUrl(hiveAvatarUrl);
+    console.log("Got hive avatar buffer:", avatarBuffer);
+
+    this.hiveAvatarDataUrl = await rawImageToBase64DataUrl(avatarBuffer);
   }
 
   /*

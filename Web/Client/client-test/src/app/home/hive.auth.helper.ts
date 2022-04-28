@@ -28,7 +28,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     this.didAccess = new ConnDID.DIDAccess();
   }
 
-  public async getAppContext(targetDid: string, onAuthError?: (e: Error) => void): Promise<AppContext> {
+  public async getAppContext(userDid: string, onAuthError?: (e: Error) => void): Promise<AppContext> {
     let appInstanceDIDInfo = await this.didAccess.getOrCreateAppInstanceDID();
 
     console.log("hiveauthhelper", "Getting app instance DID document");
@@ -62,7 +62,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       }
     }
 
-    let appContext = await AppContext.build(appContextProvider, targetDid);
+    let appContext = await AppContext.build(appContextProvider, userDid);
     return appContext;
   }
 
@@ -73,10 +73,10 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     return new VaultSubscriptionService(appContext, providerAddress);
   } */
 
-  public async getVaultServices(targetDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultServices> {
-    let appContext = await this.getAppContext(targetDid, onAuthError);
+  public async getVaultServices(userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultServices> {
+    let appContext = await this.getAppContext(userDid, onAuthError);
     if (!providerAddress)
-      providerAddress = await AppContext.getProviderAddress(targetDid); // TODO: cache, don't resolve every time
+      providerAddress = await AppContext.getProviderAddress(userDid); // TODO: cache, don't resolve every time
     return new VaultServices(appContext, providerAddress);
   }
 
