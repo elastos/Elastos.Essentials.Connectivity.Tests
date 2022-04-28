@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
 import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
-import { AppContext, FindExecutable } from '@elastosfoundation/hive-js-sdk';
+import { FindExecutable } from '@elastosfoundation/hive-js-sdk';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 import { BrowserConnectivitySDKHiveAuthHelper } from './hive.auth.helper';
@@ -776,15 +776,10 @@ export class HomePage {
   public async testHive() {
     let hiveAuthHelper = new BrowserConnectivitySDKHiveAuthHelper("mainnet");
 
-    console.log("Fetching hive provider address");
-
     let targetDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq";
-    let providerAddress = await AppContext.getProviderAddress(targetDid); // TODO: cache, don't resolve every time
 
-    console.log("Got hive provider address", providerAddress);
     console.log("Initializing vault services");
-
-    let vaultServices = await hiveAuthHelper.getVaultServices(targetDid, providerAddress);
+    let vaultServices = await hiveAuthHelper.getVaultServices(targetDid);
 
     console.log("Vault services initialized");
 
