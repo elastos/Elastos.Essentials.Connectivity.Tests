@@ -40,14 +40,7 @@
     <br />
     <ion-button (click)="testSignDIDData()">Sign data with DID</ion-button>
     <br />
-    <ion-button (click)="testSetHiveAddress()">Set hive vault address</ion-button>
-    <ion-button (click)="testHiveBackupCredential()">Get hive backup credential</ion-button>
-    <br />
     <ion-button (click)="testDIDTransaction()">Publish DID Transaction</ion-button>
-    <br />
-    <ion-button (click)="testGetAppIDCredential('published')">Get app ID cred (published)</ion-button>
-    <ion-button (click)="testGetAppIDCredential('publishednoinfo')">Get app ID cred (published no info)</ion-button>
-    <ion-button (click)="testGetAppIDCredential('unpublished')">Get app ID cred (unpublished)</ion-button>
     <br />
 
     <h3>Elastos: Others</h3>
@@ -73,6 +66,11 @@
     <br />
 
     <h3>Storage</h3>
+    <ion-button (click)="testSetHiveAddress()">Set hive vault address</ion-button>
+    <ion-button (click)="testHiveBackupCredential()">Get hive backup credential</ion-button>
+    <ion-button (click)="testGetAppIDCredential('published')">Get app ID cred (published)</ion-button>
+    <ion-button (click)="testGetAppIDCredential('publishednoinfo')">Get app ID cred (published no info)</ion-button>
+    <ion-button (click)="testGetAppIDCredential('unpublished')">Get app ID cred (unpublished)</ion-button>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>
     <ion-button (click)="testHiveDownloadAvatar()">Download hive avatar</ion-button>
     <img [src]="hiveAvatarDataUrl" class="hive-avatar" />

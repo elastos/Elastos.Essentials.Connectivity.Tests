@@ -250,14 +250,15 @@ export class HomePage {
           ]
         }
         break;
-      case 'nameidwithinexistingissuer':
+      /* case 'nameidwithinexistingissuer':
         request = {
-          claims: [ConnDID.simpleIdClaim("Your name", "name").withIssuers([
-            "did:elastos:inexisting",
-            //"did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq"
-          ])]
+          claims: [
+            ConnDID.claimDescription("Your name").withClaim(
+              ConnDID.idClaim("name").withIssuers(["did:elastos:inexisting"])
+            )
+          ]
         } // Equivalent to the deprecated getCredentials() with claim "name"
-        break;
+        break; */
       case 'imported':
         request = {
           claims: [
