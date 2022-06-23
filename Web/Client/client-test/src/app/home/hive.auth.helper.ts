@@ -155,6 +155,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
           }
         }
 
+        console.log("hiveauthhelper", "Using app id credential", appIdCredential);
+
         // Create the presentation that includes hive back end challenge (nonce) and the app id credential.
         console.log("hiveauthhelper", "Creating DID presentation response for Hive authentication challenge");
         let builder = await VerifiablePresentation.createFor(appInstanceDID.toString(), null, appInstanceDIDResult.didStore);
@@ -203,7 +205,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       catch (e) {
         // Verification error?
         // Could not verify the received JWT as valid - reject the authentication request by returning a null token
-        reject("The received authentication JWT token signature cannot be verified or failed to verify: " + new String(e) + ". Is the hive back-end DID published? Are you on the right network?");
+        reject("generateAuthPresentationJWT() exception: " + new String(e) + ". Is the hive back-end DID published? Are you on the right network?");
         return;
       }
     });
@@ -224,6 +226,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       // Ask the identity wallet (eg: Essentials) to generate an app id credential.
       let didAccess = new ConnDID.DIDAccess();
       let appIdCredential = await didAccess.generateAppIdCredential();
+
+      console.log("hiveauthhelper", "Generated new app id credential:", appIdCredential);
 
       // Save this issued credential for later use.
       await storedAppInstanceDID.didStore.storeCredential(appIdCredential);

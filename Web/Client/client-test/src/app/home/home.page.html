@@ -19,8 +19,6 @@
     <ion-button (click)="testRequestCredentials('nameid')">Req. Cred. - name id</ion-button>
     <ion-button (click)="testRequestCredentials('kyc')">Req. Cred. - kyc by type</ion-button>
     <ion-button (click)="testRequestCredentials('nameemailidopt')">Req. Cred. - name id, email id opt</ion-button>
-    <ion-button (click)="testRequestCredentials('nameidwithinexistingissuer')">Req. Cred. - name id with inex. issuer
-    </ion-button>
     <ion-button (click)="testRequestCredentials('imported')">Req. Cred. - imported from tests
     </ion-button>
     <br />
@@ -71,6 +69,7 @@
     <ion-button (click)="testGetAppIDCredential('published')">Get app ID cred (published)</ion-button>
     <ion-button (click)="testGetAppIDCredential('publishednoinfo')">Get app ID cred (published no info)</ion-button>
     <ion-button (click)="testGetAppIDCredential('unpublished')">Get app ID cred (unpublished)</ion-button>
+    <ion-button (click)="testGetOrCreateAppInstanceDID()">Get or create app instance DID</ion-button>
     <ion-button (click)="testHive()">Test Hive Storage</ion-button>
     <ion-button (click)="testHiveDownloadAvatar()">Download hive avatar</ion-button>
     <img [src]="hiveAvatarDataUrl" class="hive-avatar" />
@@ -83,7 +82,11 @@
     <h3>Other tests</h3>
     <ion-button (click)="essNetHref()">Ess.net href</ion-button>
     <ion-button (click)="essNetWindow()">Ess.net win open</ion-button>
+    <br />
     <a href="https://wallet.elastos.net/pay?amount=12" target="_blank">Pay link</a>
+    <br />
+    <a href="https://did.elastos.net/requestcredentials" target="_blank">DID req cred link</a>
+    <br />
     <ion-button (click)="startCamera()">Start camera</ion-button>
     <video style="width: 300px; height: 200px"></video>
 

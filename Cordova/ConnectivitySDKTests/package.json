@@ -19,7 +19,7 @@
     "@angular/platform-browser": "^11.2.0",
     "@angular/platform-browser-dynamic": "^11.2.0",
     "@angular/router": "^11.2.0",
-    "@elastosfoundation/elastos-connectivity-sdk-cordova": "^1.0.19",
+    "@elastosfoundation/elastos-connectivity-sdk-cordova": "^2.0.2",
     "@elastosfoundation/elastos-connector-localidentity-cordova": "^1.0.0",
     "@elastosfoundation/essentials-connector-cordova": "^1.0.2",
     "@ionic/angular": "^5.5.2",
@@ -35,9 +35,7 @@
     "@angular/compiler": "^11.2.0",
     "@angular/compiler-cli": "^11.2.0",
     "@angular/language-service": "^11.2.0",
-    "@elastosfoundation/elastos-cordova-plugin-did": "file:../../../Elastos.DID.Cordova.SDK",
-    "@elastosfoundation/elastos-cordova-plugin-hive": "file:../../../Elastos.NET.Hive.Cordova.SDK",
-    "@elastosfoundation/elastos-cordova-plugin-intent": "file:../../../Elastos.Cordova.Plugins.Intent",
+    "@elastosfoundation/elastos-cordova-plugin-intent": "^2.0.2",
     "@ionic/angular-toolkit": "^3.1.0",
     "@types/node": "^12.11.1",
     "codelyzer": "^6.0.0",
@@ -70,9 +68,9 @@
       },
       "cordova-plugin-ionic-keyboard": {},
       "cordova-clipboard": {},
-      "@elastosfoundation/elastos-cordova-plugin-did": {},
       "@elastosfoundation/elastos-cordova-plugin-intent": {},
-      "@elastosfoundation/elastos-cordova-plugin-hive": {}
+      "@elastosfoundation/elastos-cordova-plugin-hive": {},
+      "@elastosfoundation/elastos-cordova-plugin-did": {}
     },
     "platforms": [
       "ios",

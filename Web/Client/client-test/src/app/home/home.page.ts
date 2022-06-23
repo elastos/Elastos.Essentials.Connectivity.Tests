@@ -504,6 +504,27 @@ export class HomePage {
     console.log("App id credential:", credential);
   }
 
+  /**
+   * Test to make sure that multiple calls to getOrCreateAppInstanceDID() at the same time get queued and not mixed.
+   */
+  public async testGetOrCreateAppInstanceDID() {
+    let didAccess = new ConnDID.DIDAccess();
+
+    // Hack to delete the app instance DID: set a connector and unset it
+    await connectivity.setActiveConnector(this.essentialsConnector.name);
+    await connectivity.setActiveConnector(null);
+
+    console.log(`Getting or creating app instance DID several times`);
+
+    // Parrallel calls on purpose
+    for (let i = 0; i < 10; i++) {
+      console.log("Getting or creating app instance DID", i)
+      didAccess.getOrCreateAppInstanceDID().then(info => {
+        console.log("Received app instance DID", i, info.did);
+      });
+    }
+  }
+
   public async testDIDTransaction() {
     let connector = await this.walletConnectProvider.getWalletConnector();
 

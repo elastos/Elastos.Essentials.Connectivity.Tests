@@ -14,33 +14,34 @@
   </ion-header>
   <div id="container">
     <ion-button (click)="testIntent()">Raw Intent</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testResolveDIDDocument()">Resolve DID</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testGetCredentials()">Get Credentials (sign in)</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="testPay()">test Pay</ion-button>
-    <br/>
+    <br />
+    <ion-button (click)="testGetAppIDCredential()">Get app ID credential</ion-button>
     <ion-button (click)="testHiveAuth()">Hive Auth</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="unselectActiveConnector()">Forget current connector</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="revokeHiveAuthToken()">Forget hive auth token</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="deleteLocalStorage()">Delete local storage (instance DIDs, local identity etc)</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="manageLocalIdentity()">Manage local identity</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="setLanguage('en')">Language: EN</ion-button>
     <ion-button (click)="setLanguage('fr')">Language: FR</ion-button>
     <ion-button (click)="setLanguage('zh')">Language: ZH</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="setDarkMode(false)">Light theme mode</ion-button>
     <ion-button (click)="setDarkMode(true)">Dark theme mode</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="registerEssentialsConnector()">Connector: register Essentials</ion-button>
     <ion-button (click)="unregisterEssentialsConnector()">Connector: unregister Essentials</ion-button>
-    <br/>
+    <br />
     <ion-button (click)="registerLocalConnector()">Connector: register Local identity</ion-button>
     <ion-button (click)="unregisterLocalConnector()">Connector: unregister Local identity</ion-button>
   </div>
