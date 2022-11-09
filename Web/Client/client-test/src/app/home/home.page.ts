@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
-import { DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
-import { connectivity, DID as ConnDID, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { DefaultDIDAdapter, DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
+import { connectivity, DID as ConnDID, UX, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { FindExecutable, ScriptRunner } from '@elastosfoundation/hive-js-sdk';
 import WalletConnectProvider from "@walletconnect/web3-provider";
@@ -122,12 +122,12 @@ export class HomePage {
 
     // Subscribe to accounts change
     this.walletConnectProvider.on("accountsChanged", (accounts: string[]) => {
-      console.log(accounts);
+      console.log("Accounts changed:", accounts);
     });
 
     // Subscribe to chainId change
     this.walletConnectProvider.on("chainChanged", (chainId: number) => {
-      console.log(chainId);
+      console.log("Chain ID changed:", chainId);
     });
 
     // Subscribe to session disconnection
@@ -149,9 +149,16 @@ export class HomePage {
   }
 
   public useApplicationDID() {
-    let callerDID = "did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ"; // TestApp's DID
-    connectivity.setApplicationDID(callerDID);
-    console.log("Using application DID " + callerDID, connectivity);
+    this._userApplicationDID("did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ");// TestApp's DID
+  }
+
+  public useFeedsApplicationDID() {
+    this._userApplicationDID("did:elastos:iqtWRVjz7gsYhyuQEb1hYNNmWQt1Z9geXg");
+  }
+
+  private _userApplicationDID(appDID: string) {
+    connectivity.setApplicationDID(appDID);
+    console.log("Using application DID " + appDID);
   }
 
   public clearApplicationDID() {
@@ -326,7 +333,7 @@ export class HomePage {
     // For this test, always re-create a new identity for the signer of the created credential.
     // In real life, the signer should remain the same.
     Features.enableJsonLdContext(true);
-    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.MAINNET));
+    DIDBackend.initialize(new DefaultDIDAdapter("mainnet"));
     let didStore = await DIDStore.open(storeId);
     let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
     console.log("Created identity:", rootIdentity);
@@ -377,7 +384,7 @@ export class HomePage {
     // For this test, always re-create a new identity for the signer of the created credential.
     // In real life, the signer should remain the same.
     Features.enableJsonLdContext(true);
-    DIDBackend.initialize(new ConnDID.ElastosIODIDAdapter(ConnDID.ElastosIODIDAdapterMode.MAINNET));
+    DIDBackend.initialize(new DefaultDIDAdapter("mainnet"));
     let didStore = await DIDStore.open(storeId);
     let rootIdentity = RootIdentity.createFromMnemonic(Mnemonic.getInstance().generate(), passphrase, didStore, storePass, true);
     console.log("Created identity:", rootIdentity);
@@ -494,7 +501,7 @@ export class HomePage {
     console.log(`Trying to get an app id credential (${mode})`);
 
     if (mode === "published")
-      connectivity.setApplicationDID("did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ"); // TestApp's DID
+      connectivity.setApplicationDID("did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK"); // KYCME's DID
     else if (mode === "publishednoinfo")
       connectivity.setApplicationDID("did:elastos:ip8v6KFcby4YxVgjDUZUyKYXP3gpToPP8A"); // Unmaintained but published DID
     else
@@ -563,6 +570,12 @@ export class HomePage {
     console.log("Trying to get credentials");
     let response = await wallet.pay({ receiver: '0x0aD689150EB4a3C541B7a37E6c69c1510BCB27A4', amount: 0.0001, memo: 'just test memo', currency: 'ELA/ETHSC' });
     console.log("Pay response", response);
+  }
+
+  public async testEasyBridgeOnBoarding() {
+    let ux = new UX.UXAccess();
+    console.log("Trying to show essentials easy bridge on boarding screen");
+    let response = await ux.onBoard("easybridge", "Bridge tokens easily", "Start quickly on Meteast on Elastos: get ELA in less than 2 minutes from other chains.", "Get ELA now");
   }
 
   /************
