@@ -1,12 +1,30 @@
 import { Component } from '@angular/core';
-import { connectivity, DID, Hive, localization, theme, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
+import { connectivity, DID, localization, theme, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-cordova";
 import { localIdentity, LocalIdentityConnector } from "@elastosfoundation/elastos-connector-localidentity-cordova";
 import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cordova";
 import { Platform } from '@ionic/angular';
+import { Buffer } from 'buffer';
+import { CURVE_TYPE, EcdsaSigner } from '../helper/ecdsasigner';
+import { SHA256 } from '../helper/sha256';
 
 declare let didManager: DIDPlugin.DIDManager;
 declare let intentManager: IntentPlugin.IntentManager;
 declare let hiveManager: HivePlugin.HiveManager;
+
+enum WalletAddressType {
+  WalletAddressType_btc_legacy = 'btclegacy',
+  WalletAddressType_ela = 'elastosmainchain',
+  WalletAddressType_evm = 'evm',
+  WalletAddressType_iotex = 'iotex',
+}
+
+type WalletAddress = {
+  addressType: WalletAddressType,
+  address: string,
+  publicKey: string,
+  signature: string, // result of signature of concat(did, wallet address)
+}
+
 
 @Component({
   selector: 'app-home',
@@ -121,6 +139,10 @@ export class HomePage {
           required: false,
           reason: "For test"
         },
+        wallet: {
+          required: false,
+          reason: "For test"
+        },
         interests: {
           required: false,
           reason: "For test"
@@ -132,9 +154,47 @@ export class HomePage {
     if (presentation) {
       console.log("Got credentials:", presentation);
       alert(JSON.stringify(presentation));
+
+      this.verifyWalletCredentials(presentation);
     }
     else {
       alert("Empty presentation returned, something wrong happened, or operation was cancelled");
+    }
+  }
+
+  private verifyWalletCredentials(presentation: any) {
+    let credentials = presentation.verifiableCredential;
+    if (credentials) {
+      let walletCredential = credentials.find( c => {
+        return c.credentialSubject.wallet;
+      })
+
+      if (walletCredential) {
+        console.log("Got walletCredential:", walletCredential);
+        let walletAddressList: WalletAddress[] = walletCredential.credentialSubject.wallet;
+
+        walletAddressList.forEach( a => {
+          let verify = false;
+
+          // Get digest for did + address, then encode by sha256.
+          let payload = walletCredential.credentialSubject.id + a.address;
+          let digest = SHA256.encodeToBuffer(Buffer.from(payload));
+
+          let curve_type = CURVE_TYPE.K1;
+
+          // ELA mainchain use p256 curve.
+          if (a.addressType == WalletAddressType.WalletAddressType_ela) {
+            curve_type = CURVE_TYPE.R1
+          }
+
+          verify = EcdsaSigner.verify(curve_type, a.publicKey, Buffer.from(a.signature.replace('0x', ''), 'hex'), digest);
+          if (!verify) {
+            alert(JSON.stringify(walletCredential));
+            return;
+          }
+        })
+        alert('Wallet address verification successful!');
+      }
     }
   }
 
@@ -145,15 +205,19 @@ export class HomePage {
     console.log("pay respone", response);
   }
 
-  public async testGetAppIDCredential(mode: string) {
+  public async testGetAppIDCredential() {
     let didAccess = new DID.DIDAccess();
 
-    console.log(`Trying to get an app id credential (${mode})`);
+    console.log(`Trying to get an app id credential`);
 
     let credential = await didAccess.generateAppIdCredential();
     console.log("App id credential:", credential);
   }
 
+  // TODO: update Hive js sdk
+  public testHiveAuth() {
+  }
+/*
   public async testHiveAuth() {
     let vault = await this.getVault();
 
@@ -165,7 +229,7 @@ export class HomePage {
       alert("Failed to call hive scripting API. Something wrong happened.");
   }
 
-  private async getVault(): Promise<HivePlugin.Vault> {
+  private async getVault() {
     let authHelper = new Hive.AuthHelper();
     let hiveClient = await authHelper.getClientWithAuth((e) => {
       console.log('auth error');
@@ -177,14 +241,15 @@ export class HomePage {
 
     return vault;
   }
-
+*/
   public async unselectActiveConnector() {
     connectivity.setActiveConnector(null);
   }
 
   public async revokeHiveAuthToken() {
-    let vault = await this.getVault();
-    vault.revokeAccessToken();
+    // TODO: update Hive js sdk
+    // let vault = await this.getVault();
+    // vault.revokeAccessToken();
   }
 
   public deleteLocalStorage() {

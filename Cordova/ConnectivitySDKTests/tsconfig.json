@@ -15,6 +15,14 @@
       "esnext",
       "dom"
     ],
+    "paths": {
+      "stream": [
+        "./node_modules/stream-browserify"
+      ],
+      "elliptic": [
+        "./node_modules/elliptic"
+      ],
+    },
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
