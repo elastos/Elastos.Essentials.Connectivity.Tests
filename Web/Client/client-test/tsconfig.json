@@ -7,14 +7,15 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "importHelpers": true,
     "target": "es2020",
+    "traceResolution": false,
     "lib": [
-      "es2015",
+      "es2020",
       "dom"
     ],
-    "module": "es2020",
+    "module": "ES2020",
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
@@ -27,8 +28,11 @@
       "stream": [
         "./node_modules/stream-browserify"
       ],
+      "path": [
+        "./node_modules/path-browserify"
+      ],
       "@elastosfoundation/did-js-sdk": [
-        "./node_modules/@elastosfoundation/did-js-sdk"
+        "./node_modules/@elastosfoundation/did-js-sdk/dist/es/did.browser.js"
       ],
       "@elastosfoundation/elastos-connectivity-sdk-js": [
         "./node_modules/@elastosfoundation/elastos-connectivity-sdk-js"

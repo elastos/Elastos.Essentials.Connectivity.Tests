@@ -6,12 +6,15 @@
     <h3>Setup</h3>
     <ion-button (click)="useInjectedWeb3()">Use injected</ion-button>
     <ion-button (click)="useCustomWalletConnect()">Use custom WC</ion-button>
+    <ion-button (click)="useCustomWalletConnectV2()">Use custom WC v2</ion-button>
     <ion-button (click)="useEssentialsWalletConnect()">Use Essentials connector WC'</ion-button>
     <ion-button (click)="disconnectWalletConnect()">Disconnect WC</ion-button>
     <br />
     <ion-button (click)="useApplicationDID()">Use test app DID</ion-button>
     <ion-button (click)="useFeedsApplicationDID()">Use feeds app DID</ion-button>
+    <br />
     <ion-button (click)="clearApplicationDID()">Clear application DID</ion-button>
+    <ion-button (click)="cleanConnectivitySDK()">Connectivity SDK clean storage</ion-button>
     <br />
 
     <h3>Elastos: Identity</h3>
@@ -55,6 +58,7 @@
 
     <h3>ETH</h3>
     <ion-button (click)="testETHCall()">Test ETH call</ion-button>
+    <ion-button (click)="testWCv2ETHCall()">Test WC v2 client ETH call</ion-button>
     <br />
     <ion-button (click)="testAddERC20()">Add ERC20 token</ion-button>
     <br />

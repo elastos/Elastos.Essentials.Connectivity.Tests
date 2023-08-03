@@ -1,6 +1,6 @@
 import { Claims, DIDDocument, JWTHeader, JWTParserBuilder, VerifiableCredential, VerifiablePresentation } from "@elastosfoundation/did-js-sdk";
 import { DID as ConnDID, DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { AppContext, AppContextProvider, DIDResolverAlreadySetupException, VaultServices } from "@elastosfoundation/hive-js-sdk";
+import { AppContext, AppContextProvider, DIDResolverAlreadySetupException, Vault } from "@elastosfoundation/hive-js-sdk";
 import dayjs from "dayjs";
 
 /**
@@ -28,8 +28,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     this.didAccess = new ConnDID.DIDAccess();
   }
 
-  public async getAppContext(userDid: string, onAuthError?: (e: Error) => void): Promise<AppContext> {
-    let appInstanceDIDInfo = await this.didAccess.getOrCreateAppInstanceDID();
+  public async getAppContext(appDid: string, userDid: string, onAuthError?: (e: Error) => void): Promise<AppContext> {
+    let appInstanceDIDInfo = await this.didAccess.getOrCreateAppInstanceDID(appDid);
 
     console.log("hiveauthhelper", "Getting app instance DID document");
     let didDocument = await appInstanceDIDInfo.didStore.loadDid(appInstanceDIDInfo.did.toString());
@@ -51,7 +51,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
          */
         console.log("hiveauthhelper", "Hive client authentication challenge callback is being called with token:", authenticationChallengeJWtCode);
         try {
-          return this.handleVaultAuthenticationChallenge(authenticationChallengeJWtCode);
+          return this.handleVaultAuthenticationChallenge(appDid, authenticationChallengeJWtCode);
         }
         catch (e) {
           console.error("hiveauthhelper", "Exception in authentication handler:", e);
@@ -62,22 +62,22 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       }
     }
 
-    let appContext = await AppContext.build(appContextProvider, userDid);
+    let appContext = await AppContext.build(appContextProvider, userDid, appDid);
     return appContext;
   }
 
   /* public async getSubscriptionService(targetDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultSubscriptionService> {
     let appContext = await this.getAppContext(targetDid, onAuthError);
     if (!providerAddress)
-      providerAddress = await AppContext.getProviderAddress(targetDid); // TODO: cache, don't resolve every time
+      providerAddress = await AppContext.getProviderAddressByUserDid(targetDid); // TODO: cache, don't resolve every time
     return new VaultSubscriptionService(appContext, providerAddress);
   } */
 
-  public async getVaultServices(userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<VaultServices> {
-    let appContext = await this.getAppContext(userDid, onAuthError);
+  public async getVaultServices(appDid: string, userDid: string, providerAddress: string = null, onAuthError?: (e: Error) => void): Promise<Vault> {
+    let appContext = await this.getAppContext(appDid, userDid, onAuthError);
     if (!providerAddress)
-      providerAddress = await AppContext.getProviderAddress(userDid); // TODO: cache, don't resolve every time
-    return new VaultServices(appContext, providerAddress);
+      providerAddress = await AppContext.getProviderAddressByUserDid(userDid); // TODO: cache, don't resolve every time
+    return new Vault(appContext, providerAddress);
   }
 
   /**
@@ -104,8 +104,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     - verify jwt (using local app instance did public key provided before)
     - generate access token
   */
-  public handleVaultAuthenticationChallenge(jwtToken: string): Promise<string> {
-    return this.generateAuthPresentationJWT(jwtToken);
+  public handleVaultAuthenticationChallenge(appDid: string, jwtToken: string): Promise<string> {
+    return this.generateAuthPresentationJWT(appDid, jwtToken);
   }
 
   /**
@@ -113,7 +113,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
    * That JWT contains a verifiable presentation that contains server challenge info, and the app id credential
    * issued by the end user earlier.
    */
-  private generateAuthPresentationJWT(authChallengeJwttoken: string): Promise<string> {
+  private generateAuthPresentationJWT(appDid: string, authChallengeJwttoken: string): Promise<string> {
     console.log("hiveauthhelper", "Starting process to generate hive auth presentation JWT");
 
     // eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-misused-promises
@@ -136,18 +136,18 @@ export class BrowserConnectivitySDKHiveAuthHelper {
         let realm = claims.getIssuer() as string;
 
         console.log("hiveauthhelper", "Getting app instance DID");
-        let appInstanceDIDResult = await this.didAccess.getOrCreateAppInstanceDID();
+        let appInstanceDIDResult = await this.didAccess.getOrCreateAppInstanceDID(appDid);
         let appInstanceDID = appInstanceDIDResult.did;
 
-        let appInstanceDIDInfo = await this.didAccess.getExistingAppInstanceDIDInfo();
+        let appInstanceDIDInfo = await this.didAccess.getExistingAppInstanceDIDInfo(appDid);
 
         console.log("hiveauthhelper", "Getting app identity credential");
-        let appIdCredential = await this.didAccess.getExistingAppIdentityCredential();
+        let appIdCredential = await this.didAccess.getExistingAppIdentityCredential(appDid);
 
         if (!appIdCredential) {
           console.log("hiveauthhelper", "Empty app id credential. Trying to generate a new one");
 
-          appIdCredential = await this.generateAppIdCredential();
+          appIdCredential = await this.generateAppIdCredential(appDid);
           if (!appIdCredential) {
             console.warn("hiveauthhelper", "Failed to generate a new App ID credential");
             resolve(null);
@@ -211,21 +211,21 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     });
   }
 
-  private generateAppIdCredential(): Promise<VerifiableCredential> {
+  private generateAppIdCredential(appDid: string): Promise<VerifiableCredential> {
     // eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-misused-promises
     return new Promise(async (resolve) => {
-      let storedAppInstanceDID = await this.didAccess.getOrCreateAppInstanceDID();
+      let storedAppInstanceDID = await this.didAccess.getOrCreateAppInstanceDID(appDid);
       if (!storedAppInstanceDID) {
         resolve(null);
         return;
       }
 
       // No such credential, so we have to create one. Send an intent to get that from the did app
-      console.log("hiveauthhelper", "Starting to generate a new App ID credential.");
+      console.log("hiveauthhelper", `Starting to generate a new App ID credential for app DID ${appDid}.`);
 
       // Ask the identity wallet (eg: Essentials) to generate an app id credential.
       let didAccess = new ConnDID.DIDAccess();
-      let appIdCredential = await didAccess.generateAppIdCredential();
+      let appIdCredential = await didAccess.generateAppIdCredential(appDid);
 
       console.log("hiveauthhelper", "Generated new app id credential:", appIdCredential);
 

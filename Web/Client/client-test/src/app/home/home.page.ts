@@ -1,12 +1,17 @@
 import { Component, NgZone } from '@angular/core';
 import { DefaultDIDAdapter, DID, DIDBackend, DIDStore, Features, Issuer, Mnemonic, RootIdentity, VerifiableCredential } from "@elastosfoundation/did-js-sdk";
-import { connectivity, DID as ConnDID, UX, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { connectivity, DID as ConnDID, storage, UX, Wallet } from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { FindExecutable, ScriptRunner } from '@elastosfoundation/hive-js-sdk';
+import UniversalProvider from '@walletconnect/universal-provider/dist/types/UniversalProvider';
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 import { BrowserConnectivitySDKHiveAuthHelper } from './hive.auth.helper';
 import { rawImageToBase64DataUrl, transparentPixelIconDataUrl } from './picture.helpers';
+import { WalletConnectV2 } from './wc.v2';
+
+//const TEST_APP_DID = "did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ";
+const TEST_APP_DID = "did:elastos:iqtWRVjz7gsYhyuQEb1hYNNmWQt1Z9geXg"; // Use feeds' app did for tests, because hive needs app info to be published (test app doesn't)
 
 @Component({
   selector: 'app-home',
@@ -16,7 +21,9 @@ import { rawImageToBase64DataUrl, transparentPixelIconDataUrl } from './picture.
 export class HomePage {
   private essentialsConnector = new EssentialsConnector();
   private walletConnectProvider: WalletConnectProvider;
+  private walletConnectV2Provider: UniversalProvider;
   private web3: Web3;
+  private wcV2: WalletConnectV2;
   public infoMessage: string = "";
   public hiveAvatarDataUrl = transparentPixelIconDataUrl();
 
@@ -52,6 +59,11 @@ export class HomePage {
     await this.setupWalletConnectProvider();
   }
 
+  public async useCustomWalletConnectV2() {
+    await this.createWalletConnectV2Provider();
+    await this.setupWalletConnectV2Provider();
+  }
+
   public async useEssentialsWalletConnect() {
     this.walletConnectProvider = this.essentialsConnector.getWalletConnectProvider();
     if (!this.walletConnectProvider) {
@@ -79,7 +91,9 @@ export class HomePage {
   }
 
   private getActiveProvider() {
-    if (this.walletConnectProvider)
+    if (this.walletConnectV2Provider)
+      return this.walletConnectV2Provider;
+    else if (this.walletConnectProvider)
       return this.walletConnectProvider;
     else
       return window["ethereum"];
@@ -148,8 +162,46 @@ export class HomePage {
     this.web3 = new Web3(this.walletConnectProvider as any); // HACK
   }
 
+  public async createWalletConnectV2Provider() {
+    this.wcV2 = new WalletConnectV2();
+    await this.wcV2.setup();
+
+    console.log("Creating WC v2 universal provider");
+    this.walletConnectV2Provider = await this.wcV2.createProvider();
+  }
+
+  public setupWalletConnectV2Provider() {
+    // Subscribe for pairing URI
+    this.walletConnectV2Provider.on("display_uri", (uri) => {
+      console.log(uri);
+    });
+
+    // Subscribe to session ping
+    this.walletConnectV2Provider.on("session_ping", ({ id, topic }) => {
+      console.log(id, topic);
+    });
+
+    // Subscribe to session event
+    this.walletConnectV2Provider.on("session_event", ({ event, chainId }) => {
+      console.log(event, chainId);
+    });
+
+    // Subscribe to session update
+    this.walletConnectV2Provider.on("session_update", ({ topic, params }) => {
+      console.log(topic, params);
+    });
+
+    // Subscribe to session delete
+    this.walletConnectV2Provider.on("session_delete", ({ id, topic }) => {
+      console.log(id, topic);
+    });
+
+    console.log("Creating web3 instance from WC v2 universal provider");
+    this.web3 = new Web3(this.walletConnectV2Provider);
+  }
+
   public useApplicationDID() {
-    this._userApplicationDID("did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ");// TestApp's DID
+    this._userApplicationDID(TEST_APP_DID);// TestApp's DID
   }
 
   public useFeedsApplicationDID() {
@@ -164,6 +216,11 @@ export class HomePage {
   public clearApplicationDID() {
     connectivity.setApplicationDID(null);
     console.log("Clearing application DID");
+  }
+
+  public cleanConnectivitySDK() {
+    console.log("Cleaning up connectivity SDK storage to restart fresh");
+    storage.clean();
   }
 
   /************
@@ -688,7 +745,7 @@ export class HomePage {
 
     const account = await this.getUserAccount();
 
-    console.log("Asking to sign typed data for account", account);
+    console.log("Asking to sign typed data for account", account, provider);
 
     let data = JSON.stringify(eip712TypedData);
     let signedData = await provider.request({
@@ -713,6 +770,13 @@ export class HomePage {
     });
 
     console.log("Signed eth_sign data:", signedData);
+  }
+
+  public async testWCv2ETHCall() {
+    if (!this.wcV2)
+      await this.useCustomWalletConnectV2();
+
+    this.wcV2.sendTestCustomEthCall();
   }
 
   public async testPersonalSign() {
@@ -816,7 +880,7 @@ export class HomePage {
     let userDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq";
 
     console.log("Initializing vault services");
-    let vaultServices = await hiveAuthHelper.getVaultServices(userDid);
+    let vaultServices = await hiveAuthHelper.getVaultServices(TEST_APP_DID, userDid);
 
     console.log("Vault services initialized");
 
@@ -840,7 +904,7 @@ export class HomePage {
   public async testHiveDownloadAvatar() {
     let hiveAuthHelper = new BrowserConnectivitySDKHiveAuthHelper("mainnet");
     let userDid = "did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq"; // Current user, needs authentication for now, even to get a public hive url
-    let appContext = await hiveAuthHelper.getAppContext(userDid);
+    let appContext = await hiveAuthHelper.getAppContext(TEST_APP_DID, userDid);
 
     let hiveAvatarUrl = "hive://did:elastos:insTmxdDDuS9wHHfeYD1h5C2onEHh3D8Vq@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1632229804041?params={\"empty\":0}";
     let scriptRunner = new ScriptRunner(appContext);
