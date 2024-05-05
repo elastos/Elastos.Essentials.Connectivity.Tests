@@ -13,6 +13,11 @@ import { WalletConnectV2 } from './wc.v2';
 //const TEST_APP_DID = "did:elastos:in8oqWe4R4AswdJeFdhLDm6iGe6Ac4mqUJ";
 const TEST_APP_DID = "did:elastos:iqtWRVjz7gsYhyuQEb1hYNNmWQt1Z9geXg"; // Use feeds' app did for tests, because hive needs app info to be published (test app doesn't)
 
+enum Provider_Type  {
+  bitcoin,
+  elamain,
+  ehereum,
+}
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -97,6 +102,20 @@ export class HomePage {
       return this.walletConnectProvider;
     else
       return window["ethereum"];
+  }
+
+  private getWeb3Provider(type: Provider_Type) {
+    switch (type) {
+      case Provider_Type.bitcoin:
+        return window["unisat"];
+      case Provider_Type.elamain:
+        return window["elamain"];
+      case Provider_Type.ehereum:
+        return window["ethereum"];
+      default:
+        console.warn("getWeb3Provider Not support ", type);
+        break;
+    }
   }
 
   private getWeb3(): Web3 {
@@ -872,6 +891,84 @@ export class HomePage {
     provider.request({
       method: 'wallet_addEthereumChain', params: [addParams]
     });
+  }
+
+  // Bitcoin
+  public async testSendBitcoinCall() {
+    let provider = this.getWeb3Provider(Provider_Type.bitcoin);
+
+    console.log("Asking to send sign bitcoin", provider);
+
+    try {
+      let txid = await provider.sendBitcoin('bc1qh0ytheqaj2gg2mh7uwgm7fgl9ssluk0zgmfq79', 100000, {feeRate:12})
+      console.log("Send bitcoin:", txid);
+    }
+    catch (e) {
+      console.warn("Send bitcoin error:", e);
+    }
+  }
+
+  public async testSignBitcoinMessage() {
+    let provider = this.getWeb3Provider(Provider_Type.bitcoin);
+
+    console.log("Asking to sign message", provider);
+
+    try {
+      let hash = await provider.signMessage('Hello')
+      console.log("SignMessage:", hash);
+    }
+    catch (e) {
+      console.warn("SignMessage error:", e);
+    }
+  }
+
+  public async testSignBitcoinData() {
+    let provider = this.getWeb3Provider(Provider_Type.bitcoin);
+
+    console.log("Asking to sign data", provider);
+
+    let playload = {
+      rawData: '0200000001369f0ce2f97896e32e898f02078e0624bac2de3c7d0997fe82f4e49329070dad00000000000100400001f401000000000000220020ad885dcfbab141e7721b922c73d23a8ba1c13581bb957541d5777ddf9b46ca2500000000',
+      prevOutScript: '6321020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ad2102a12298f9e970f87b2d2059c8ac5bb95f34c1b4a2b5013c5120fabb7120e184e2ac676321020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ad210200493eb975eedf5d5d2f7f5458e790e8264576ec137df06c8f3f90c91b0a6f78ac676303010040b2752102a12298f9e970f87b2d2059c8ac5bb95f34c1b4a2b5013c5120fabb7120e184e2ada8209f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a876703fa0140b27521020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ac686868',
+      inIndex: 0,
+      value: 1000
+    }
+
+    try {
+      let hash = await provider.signData(playload.rawData, playload.prevOutScript, playload.inIndex, playload.value)
+      console.log("SignData:", hash);
+    }
+    catch (e) {
+      console.warn("SignData error:", e);
+    }
+  }
+
+  public async testPushBitcoinTx() {
+    let provider = this.getWeb3Provider(Provider_Type.bitcoin);
+
+    console.log("Asking to push tx", provider);
+
+    try {
+      let txid = await provider.pushTx('02000000000101e1b0398d9c2a5c6a46251a5b0ef6e9d82d80bd529fda09b4b8ba30257b1d4cc50100000000ffffffff0210270000000000001976a914c8b686e3da2a207ff91222973d56f1289d61003a88acab9f05000000000022512054872ac4653f5cefd1bb598bf46df917267391020b95ee5b01a1dcc66438f04b01403c0a943ee6831c901ae9d0452c4adf6034ce5f3d5a8f93ce1af97e1d09869322f690455ebde5f92646662fa841c397b9707f957ebda96ed794d2f136301e58e200000000')
+      console.log("PushTx:", txid);
+    }
+    catch (e) {
+      console.warn("PushTx error:", e);
+    }
+  }
+
+  public async testgetBitcoinPublicKey() {
+    let provider = this.getWeb3Provider(Provider_Type.bitcoin);
+
+    console.log("Asking to sign data", provider);
+
+    try {
+      let publicKey = await provider.getPublicKey()
+      console.log("Get Public Key:", publicKey);
+    }
+    catch (e) {
+      console.warn("Get Public Key error:", e);
+    }
   }
 
   public async testHive() {
