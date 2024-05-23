@@ -105,6 +105,11 @@ export class HomePage {
   }
 
   private getWeb3Provider(type: Provider_Type) {
+    // if (this.walletConnectV2Provider)
+    //   return this.walletConnectV2Provider;
+    // else if (this.walletConnectProvider)
+    //   return this.walletConnectProvider;
+
     switch (type) {
       case Provider_Type.bitcoin:
         return window["unisat"];
@@ -676,11 +681,16 @@ export class HomePage {
   }
 
   private async getUserAccount(): Promise<string> {
-    let accounts = await this.getWeb3().eth.getAccounts();
-    if (!accounts || accounts.length == 0) {
-      throw new Error("No EVM account available");
+    try {
+      let accounts = await this.getWeb3().eth.getAccounts();
+      if (!accounts || accounts.length == 0) {
+        throw new Error("No EVM account available");
+      }
+      return accounts[0];
     }
-    return accounts[0];
+    catch (e) {
+      console.warn("getUserAccount error:", e)
+    }
   }
 
   public async testETHCall() {
@@ -844,6 +854,30 @@ export class HomePage {
     }
   }
 
+  public async testApproveERC20() {
+    const tokenAddress = '0x0daddd286487f3a03ea9a1b693585fd46cdccf9f';
+    const data = '0x095ea7b300000000000000000000000014962b8f17d5ed90d889b140171533db00759eb50000000000000000000000000000000000000000000000004563918244f40000';
+
+    try {
+      const txid = await this.getActiveProvider().request({
+        method: 'eth_sendTransaction',
+        params: [{
+          data: data,
+          to: tokenAddress,
+        }],
+      });
+
+      if (txid) {
+        console.log('Approve Token txid:', txid);
+      }
+      else {
+        console.warn('Approve Token error');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   public async testSwitchToElastos() {
     let provider = this.getActiveProvider();
     provider.request({
@@ -927,15 +961,9 @@ export class HomePage {
 
     console.log("Asking to sign data", provider);
 
-    let playload = {
-      rawData: '0200000001369f0ce2f97896e32e898f02078e0624bac2de3c7d0997fe82f4e49329070dad00000000000100400001f401000000000000220020ad885dcfbab141e7721b922c73d23a8ba1c13581bb957541d5777ddf9b46ca2500000000',
-      prevOutScript: '6321020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ad2102a12298f9e970f87b2d2059c8ac5bb95f34c1b4a2b5013c5120fabb7120e184e2ac676321020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ad210200493eb975eedf5d5d2f7f5458e790e8264576ec137df06c8f3f90c91b0a6f78ac676303010040b2752102a12298f9e970f87b2d2059c8ac5bb95f34c1b4a2b5013c5120fabb7120e184e2ada8209f64a747e1b97f131fabb6b447296c9b6f0201e79fb3c5356e6c77e89b6a806a876703fa0140b27521020f8cb5261195d88c95a76fd3007e16814a2e39f994c685988e770ce45d9783f7ac686868',
-      inIndex: 0,
-      value: 1000
-    }
-
+    let rawData = '02f5f21b2994306bf22583944e975487b1719fc5f0535d4f45a3700417a0f081'
     try {
-      let hash = await provider.signData(playload.rawData, playload.prevOutScript, playload.inIndex, playload.value)
+      let hash = await provider.signData(rawData, 'ecdsa')
       console.log("SignData:", hash);
     }
     catch (e) {
